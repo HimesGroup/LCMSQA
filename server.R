@@ -1,22 +1,36 @@
-
 server <- function(input, output, session) {
-  ## output$files <- renderTable(input$upload)
 
+  ##############################################################################
+  ## Validate files have spectra
+  ##############################################################################
   flist <- reactive({
     req(input$upload)
-    input$upload
+    tryCatch({
+      has_spectra(input$upload$datapath) ## spectra validation
+      input$upload
+    }, error = function(e) {
+      ## Show notification for invalid files
+      showNotification(paste0(
+        "Input must be valid mass-spectrometry data files ",
+        "in open format (mzML, mzData, mzXML, and netCDF). ",
+        "Please re-upload new files."
+      ), duration = 5, type = "error", closeButton = FALSE)
+      Sys.sleep(6)
+      session$reload() ## reload session
+    })
   })
 
+  ##############################################################################
+  ## Extend input for intermediate states
+  ##############################################################################
   v <- reactiveValues(fname = NULL, raw = NULL, raw_sub = NULL, fdata = NULL,
                       manual = FALSE, xic = NULL, massspec = NULL,
                       scan_choices = NULL, res = NULL, peak = NULL,
                       ui_nopeak = FALSE, feature = NULL, peak_sub = NULL)
 
-
-  ## observeEvent(req(input$manual), {
-  ##   v$manual <- input$manual
-  ## })
-
+  ##############################################################################
+  ## Conditional UI for m/z specification
+  ##############################################################################
   mz_manual <- reactive({
     if (isTruthy(input$manual)) {
       TRUE
@@ -26,7 +40,6 @@ server <- function(input, output, session) {
   })
 
   mandatory_fields <- reactive({
-    ## if (v$manual) {
     if (mz_manual()) {
       mandatory_fields <- mandatory_fields_manual
     } else {
@@ -39,7 +52,6 @@ server <- function(input, output, session) {
   })
 
   mzr <- reactive({
-    ## if (v$manual) {
     if (mz_manual()) {
       c(as.numeric(input$xic_mz_min), as.numeric(input$xic_mz_max))
     } else {
@@ -54,13 +66,14 @@ server <- function(input, output, session) {
 
   observe({
     ## check if all mandatory fields have a value
-    mandatory_filled <-
-      vapply(mandatory_fields(),
-             function(x) {
-               !is.null(input[[x]]) && input[[x]] != "" &&
-                 !is.na(suppressWarnings(as.numeric(input[[x]])))
-             },
-             logical(1))
+    mandatory_filled <- vapply(
+      mandatory_fields(),
+      function(x) {
+        !is.null(input[[x]]) && input[[x]] != "" &&
+          !is.na(suppressWarnings(as.numeric(input[[x]])))
+      },
+      logical(1)
+    )
     mandatory_filled <- all(mandatory_filled)
     if (mandatory_filled && (mzr()[2] <= mzr()[1])) {
       mandatory_filled <- FALSE
@@ -70,33 +83,16 @@ server <- function(input, output, session) {
     }
     ## enable/disable the submit button
     shinyjs::toggleState(id = "xic_plot", condition = mandatory_filled)
-    shinyjs::toggleState(id = "peak_peaking", condition = mandatory_filled)
+    shinyjs::toggleState(id = "feature_detection", condition = mandatory_filled)
   })
 
-  ## observe({
-  ##   ## check if all mandatory fields have a value
-  ##   mandatory_filled <-
-  ##     vapply(mandatory_fields,
-  ##            function(x) {
-  ##              !is.null(input[[x]]) && input[[x]] != "" &&
-  ##                !is.na(suppressWarnings(as.numeric(input[[x]])))
-  ##            },
-  ##            logical(1))
-  ##   mandatory_filled <- all(mandatory_filled)
-  ##   if (mandatory_filled && (as.numeric(input$xic_mz_max) <= as.numeric(input$xic_mz_min))) {
-  ##     mandatory_filled <- FALSE
-  ##   }
-  ##   if (mandatory_filled && (as.numeric(input$xic_rt_max) <= as.numeric(input$xic_rt_min))) {
-  ##     mandatory_filled <- FALSE
-  ##   }
-  ##   ## enable/disable the submit button
-  ##   shinyjs::toggleState(id = "xic_plot", condition = mandatory_filled)
-  ##   shinyjs::toggleState(id = "peak_peaking", condition = mandatory_filled)
-  ## })
-
+  ##############################################################################
+  ## Read LC/MS data onto R via XCMS
+  ##############################################################################
   observeEvent(flist(), {
+    v$fname <- file_path_sans_ext(flist()$name)
     withProgress(message = "Reading Data...", value = 0, {
-      v$fname <- file_path_sans_ext(flist()$name)
+      ## v$fname <- file_path_sans_ext(flist()$name)
       v$raw <- readMSData(
         flist()$datapath,
         pdata = new(
@@ -117,19 +113,12 @@ server <- function(input, output, session) {
     })
     output$peakpicking <- renderUI(
       tagList(
-        ## pickerInput(
-        ##   "fileselect", "File List", choices = flist()$name,
-        ##   selected = flist()$name,
-        ##   multiple = TRUE, options = list(`actions-box` = TRUE)
-        ## ),
         peakpicking_ui()
       )
     )
     output$tabs <- renderUI(
       maintabs_ui(v$fdata)
     )
-    ## updateCheckboxInput(session, "manual", value = FALSE)
-    ## reset("xic_plot")
   })
 
   observeEvent(v$fdata, {
@@ -198,7 +187,7 @@ server <- function(input, output, session) {
     })
   })
 
-  observeEvent(input$peak_peaking, {
+  observeEvent(input$feature_detection, {
     if (v$ui_nopeak) {
       removeNotification(id = "nopeak")
       v$ui_nopeak <- FALSE
@@ -216,12 +205,6 @@ server <- function(input, output, session) {
       fitgauss = fitgauss_method,
       noise = input$noise
     )
-    ## v$raw_sub <- filterMz(
-    ##   v$raw, c(as.numeric(input$xic_mz_min), as.numeric(input$xic_mz_max))
-    ## )
-    ## v$raw_sub <- filterRt(
-    ##   v$raw_sub, c(as.numeric(input$xic_rt_min), as.numeric(input$xic_rt_max))
-    ## )
     v$raw_sub <- filterMz(v$raw, mzr())
     v$raw_sub <- filterRt(v$raw_sub, rtr())
     m <- findChromPeaks(v$raw_sub, param = cpm)

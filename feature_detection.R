@@ -190,7 +190,7 @@ peakpicking_ui <- function() {
     ),
     column(
       12, align = "right",
-      actionButton("peak_peaking", "Detect Features")
+      actionButton("feature_detection", "Detect Features")
     )
   )
 }

@@ -25,6 +25,10 @@ mandatory_fields_manual <- c(
   "xic_mz_min", "xic_mz_max", "xic_rt_min", "xic_rt_max"
 )
 
+has_spectra <- function(x) {
+  all(MSnbase::hasSpectra(x))
+}
+
 test_mandatory <- function(input, mandatory_fields) {
   all(
     vapply(mandatory_fields,
