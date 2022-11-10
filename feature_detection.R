@@ -76,6 +76,10 @@ peakpicking_ui <- function() {
       br()
     ),
     column(
+      12, align = "left",
+      selectizeInput("machine", "machine preset", choices = machines)
+    ),
+    column(
       4,
       bs_embed_tooltip(
         numericInput("ppm", "ppm", value = 5),

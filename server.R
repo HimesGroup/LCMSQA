@@ -41,15 +41,13 @@ server <- function(input, output, session) {
 
   mandatory_fields <- reactive({
     if (mz_manual()) {
-      mandatory_fields <- mandatory_fields_manual
+      mandatory_fields_manual
     } else {
-      mandatory_fields <- mandatory_fields_preset
+      mandatory_fields_preset
     }
   })
 
-  comp <- reactive({
-    input$compound
-  })
+  comp <- reactive(input$compound)
 
   mzr <- reactive({
     if (mz_manual()) {
@@ -84,6 +82,41 @@ server <- function(input, output, session) {
     ## enable/disable the submit button
     shinyjs::toggleState(id = "xic_plot", condition = mandatory_filled)
     shinyjs::toggleState(id = "feature_detection", condition = mandatory_filled)
+  })
+
+  ##############################################################################
+  ## Conditional default values for feature detection by machine type
+  ##############################################################################
+  machine_r <- reactive({
+    if (is.null(input$machine)) {
+      "UPLC / Q-Exactive"
+    } else {
+      input$machine
+    }
+  })
+
+  ppm_r <- reactive(get_machine_val(machine_r(), machines, machines_ppm))
+  peakwidth_r <- reactive(get_machine_val(machine_r(), machines, machines_peakwidth))
+  snrth_r <- reactive(get_machine_val(machine_r(), machines, machines_snrth))
+  mzdiff_r <- reactive(get_machine_val(machine_r(), machines, machines_mzdiff))
+  noise_r <- reactive(get_machine_val(machine_r(), machines, machines_noise))
+  pre_peak_r <- reactive(get_machine_val(machine_r(), machines, machines_pre_peak))
+  pre_int_r <- reactive(get_machine_val(machine_r(), machines, machines_pre_int))
+  bw_r <- reactive(get_machine_val(machine_r(), machines, machines_bw))
+  ## minfrac_r <- reactive(get_machine_val(machine_r(), machines, machines_minfrac))
+  binsize_r <- reactive(get_machine_val(machine_r(), machines, machines_binsize))
+
+  observe({
+    updateNumericInput(session, "ppm", value = ppm_r())
+    updateSliderInput(session, "peakwidth", value = peakwidth_r())
+    updateNumericInput(session, "snthr", value = snrth_r())
+    updateNumericInput(session, "mzdiff", value = mzdiff_r())
+    updateNumericInput(session, "noise", value = noise_r())
+    updateNumericInput(session, "pre_peak", value = pre_peak_r())
+    updateNumericInput(session, "pre_int", value = pre_int_r())
+    updateNumericInput(session, "bw", value = bw_r())
+    ## updateNumericInput(session, "minfrac", value = minfrac_r())
+    updateNumericInput(session, "binsize", value = binsize_r())
   })
 
   ##############################################################################

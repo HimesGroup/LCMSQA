@@ -74,3 +74,25 @@ compound_dat <- data.table(
          92.0334, 90.0189, 137.0395, 152.0585,
          150.031, 152.0466, 121.0316, 197.0387, 810.1246)
 )
+
+machines <- c(
+  "UPLC / Q-Exactive", "UPLC / Orbitrap",
+  "HPLC / Waters TOF", "HPLC / Ion Trap"
+)
+
+machines_ppm <- list(5, 2.5, 30, 50)
+machines_peakwidth <- list(c(5, 20), c(5, 20), c(10, 60), c(10, 60))
+machines_snrth <- list(4, 10, 6, 6)
+machines_mzdiff <- list(0.01, 0.01, 0.01, 0.01)
+machines_noise <- list(0, 1000, 0, 0)
+machines_pre_peak <- list(3, 3, 3, 3)
+machines_pre_int <- list(100, 5000, 100, 100)
+machines_bw <- list(5, 5, 5, 5)
+machines_minfrac <- list(0.5, 0.5, 0.5, 0.5)
+machines_binsize <- list(0.025, 0.015, 0.025, 0.05)
+
+get_machine_val <- function(machine, machine_list, values) {
+  names(values) <- machine_list
+  values[[machine]]
+  ## do.call(switch, c(machine, as.list(values)))
+}
