@@ -59,21 +59,8 @@ get_compound_mzrange <- function(compound, compound_dat, ppm) {
   get_mzrange(mz, ppm)
 }
 
-compounds <- c(
-  "Lactate", "Sodium Pyruvate", "Aspartic Acid", "Glutamic Acid",
-  "KG", "HG", "Succinic Acid", "Citric Acid", "AcetylCoA-d2"
-)
-
-compound_dat <- data.table(
-  id = c(paste0(compounds, " [M+H]+"),
-         paste0(compounds, " [M-H]-")),
-  mode = c(rep("positive", length(compounds)),
-           rep("negative", length(compounds))),
-  mz = c(94.04903, 92.0333, 139.0552, 154.0742,
-         152.06018, 154.06122, 123.0473, 199.0544, 812.1397,
-         92.0334, 90.0189, 137.0395, 152.0585,
-         150.031, 152.0466, 121.0316, 197.0387, 810.1246)
-)
+compound_dat <- fread("compound_info.csv")
+compound_dat[, id := paste(compound, adduct, sep = " ")]
 
 machines <- c(
   "UPLC / Q-Exactive", "UPLC / Orbitrap",

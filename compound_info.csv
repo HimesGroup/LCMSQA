@@ -1,0 +1,19 @@
+compound,adduct,mode,mz
+Lactate,[M+H]+,positive,94.04903
+Sodium Pyruvate,[M+H]+,positive,92.0333
+Aspartic Acid,[M+H]+,positive,139.0552
+Glutamic Acid,[M+H]+,positive,154.0742
+KG,[M+H]+,positive,152.06018
+HG,[M+H]+,positive,154.06122
+Succinic Acid,[M+H]+,positive,123.0473
+Citric Acid,[M+H]+,positive,199.0544
+AcetylCoA-d2,[M+H]+,positive,812.1397
+Lactate,[M-H]-,negative,92.0334
+Sodium Pyruvate,[M-H]-,negative,90.0189
+Aspartic Acid,[M-H]-,negative,137.0395
+Glutamic Acid,[M-H]-,negative,152.0585
+KG,[M-H]-,negative,150.031
+HG,[M-H]-,negative,152.0466
+Succinic Acid,[M-H]-,negative,121.0316
+Citric Acid,[M-H]-,negative,197.0387
+AcetylCoA-d2,[M-H]-,negative,810.1246
