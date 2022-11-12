@@ -97,7 +97,7 @@ server <- function(input, output, session) {
 
   ppm_r <- reactive(get_machine_val(machine_r(), machines, machines_ppm))
   peakwidth_r <- reactive(get_machine_val(machine_r(), machines, machines_peakwidth))
-  snrth_r <- reactive(get_machine_val(machine_r(), machines, machines_snrth))
+  snthr_r <- reactive(get_machine_val(machine_r(), machines, machines_snthr))
   mzdiff_r <- reactive(get_machine_val(machine_r(), machines, machines_mzdiff))
   noise_r <- reactive(get_machine_val(machine_r(), machines, machines_noise))
   pre_peak_r <- reactive(get_machine_val(machine_r(), machines, machines_pre_peak))
@@ -109,7 +109,7 @@ server <- function(input, output, session) {
   observe({
     updateNumericInput(session, "ppm", value = ppm_r())
     updateSliderInput(session, "peakwidth", value = peakwidth_r())
-    updateNumericInput(session, "snthr", value = snrth_r())
+    updateNumericInput(session, "snthr", value = snthr_r())
     updateNumericInput(session, "mzdiff", value = mzdiff_r())
     updateNumericInput(session, "noise", value = noise_r())
     updateNumericInput(session, "pre_peak", value = pre_peak_r())
@@ -250,7 +250,7 @@ server <- function(input, output, session) {
       )
       v$ui_nopeak <- TRUE
     } else {
-      updateTabsetPanel(session, "tabs", selected = "Peak Picking")
+      updateTabsetPanel(session, "tabs", selected = "Feature Detection")
       pdp <- PeakDensityParam(
         sampleGroups = rep(1, nrow(input$upload)),
         bw = input$bw,

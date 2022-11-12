@@ -69,7 +69,7 @@ machines <- c(
 
 machines_ppm <- list(5, 2.5, 30, 50)
 machines_peakwidth <- list(c(5, 20), c(5, 20), c(10, 60), c(10, 60))
-machines_snrth <- list(4, 10, 6, 6)
+machines_snthr <- list(4, 10, 6, 6)
 machines_mzdiff <- list(0.01, 0.01, 0.01, 0.01)
 machines_noise <- list(0, 1000, 0, 0)
 machines_pre_peak <- list(3, 3, 3, 3)
