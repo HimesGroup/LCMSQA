@@ -10,19 +10,6 @@ ui <- fluidPage(
     base_font = font_google("Roboto"),
     code_font = font_google("JetBrains Mono")
     ),
-  ## tags$head(
-  ##        tags$style(
-  ##               HTML("#shiny-notification-panel {
-  ##                 top: 0;
-  ##                 bottom: unset;
-  ##                 left: 0;
-  ##                 right: 0;
-  ##                 margin-left: auto;
-  ##                 margin-right: auto;
-  ##                 width: 50%; max-width: 450px;}"
-  ##               )
-  ##             )
-  ##      ),
   titlePanel("LC/MS Quality Assessment"),
   ## File upload
   sidebarLayout(
@@ -32,8 +19,7 @@ ui <- fluidPage(
         label = "Choose LC/MS files",
         multiple = TRUE
       ),
-      textOutput("text1"),
-      uiOutput("peakpicking"),
+      uiOutput("featuredetection"),
       width = 4
     ),
     mainPanel(

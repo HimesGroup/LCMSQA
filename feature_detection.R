@@ -1,4 +1,4 @@
-peakpicking_ui <- function() {
+featuredetection_ui <- function() {
   fluidRow(
     column(
       12,
@@ -62,7 +62,7 @@ peakpicking_ui <- function() {
     ),
     column(
       12, align = "right",
-      actionButton("xic_plot", "Generate XIC")
+      actionButton("plot_xic", "Generate XIC")
     ),
     column(
       12,
@@ -194,7 +194,7 @@ peakpicking_ui <- function() {
     ),
     column(
       12, align = "right",
-      actionButton("feature_detection", "Detect Features")
+      actionButton("detect_feature", "Detect Features")
     )
   )
 }

@@ -80,8 +80,8 @@ server <- function(input, output, session) {
       mandatory_filled <- FALSE
     }
     ## enable/disable the submit button
-    shinyjs::toggleState(id = "xic_plot", condition = mandatory_filled)
-    shinyjs::toggleState(id = "feature_detection", condition = mandatory_filled)
+    shinyjs::toggleState(id = "plot_xic", condition = mandatory_filled)
+    shinyjs::toggleState(id = "detect_feature", condition = mandatory_filled)
   })
 
   ##############################################################################
@@ -144,9 +144,9 @@ server <- function(input, output, session) {
       v$fdata <- as.data.table(do.call(rbind, dl))
       v$fdata[, file := factor(file, levels = v$fname)]
     })
-    output$peakpicking <- renderUI(
+    output$featuredetection <- renderUI(
       tagList(
-        peakpicking_ui()
+        featuredetection_ui()
       )
     )
     output$tabs <- renderUI(
@@ -154,6 +154,9 @@ server <- function(input, output, session) {
     )
   })
 
+  ##############################################################################
+  ## TIC and XIC plot
+  ##############################################################################
   observeEvent(v$fdata, {
     updateTabsetPanel(session, "tabs", selected = "Total Ion Current")
     output$tic <- renderPlotly({
@@ -171,7 +174,7 @@ server <- function(input, output, session) {
         }
       }
     })
-    observeEvent(input$xic_plot, {
+    observeEvent(input$plot_xic, {
       updateTabsetPanel(session, "tabs", selected = "Extracted Ion Chromatogram")
       v$xic <- p_xic(
         v$fdata,
@@ -195,6 +198,9 @@ server <- function(input, output, session) {
     })
   })
 
+  ##############################################################################
+  ## Mass spectrum plot
+  ##############################################################################
   observeEvent({
     input$fileselect
     input$ms_int_cut
@@ -220,7 +226,10 @@ server <- function(input, output, session) {
     })
   })
 
-  observeEvent(input$feature_detection, {
+  ##############################################################################
+  ## Feature detection
+  ##############################################################################
+  observeEvent(input$detect_feature, {
     if (v$ui_nopeak) {
       removeNotification(id = "nopeak")
       v$ui_nopeak <- FALSE
@@ -282,8 +291,6 @@ server <- function(input, output, session) {
         colnames(fval)[-1] <- as.character(pData(v$raw_sub)$fname)
         mz_cols <- c("mzmed", "mzmin", "mzmax")
         rt_cols <- c("rtmed", "rtmin", "rtmax")
-        ## keep_cols <- c("feature", mz_cols, rt_cols)
-        ## v$feature <- merge(fdef[, ..keep_cols], fval, sort = FALSE)
         v$feature <- merge(fdef, fval, sort = FALSE)
         feature_tbl <- v$feature[, .(mzmed, mzmin, mzmax, rtmed, rtmin, rtmax)]
         feature_tbl[, (mz_cols) := lapply(.SD, function(x) sprintf("%.4f", x)),
@@ -305,6 +312,9 @@ server <- function(input, output, session) {
     }
   })
 
+  ##############################################################################
+  ## Feature and peak mapping and peak visualization
+  ##############################################################################
   observeEvent(input$feature_tbl_rows_selected, {
     idx <- input$feature_tbl_rows_selected
     output$feature_fig <- renderUI(tagList(
@@ -323,8 +333,6 @@ server <- function(input, output, session) {
       h5("Peaks for the Selected Feature", style = "color:orange"),
       br(),
       DTOutput("feature_peak_map")
-      ## br(),
-      ## actionButton("peak_show", "Show Peaks")
     ))
     peaklist <- as.data.table(v$peak)[v$feature$peakidx[[idx]], ]
     v$peak_sub <- merge(peaklist, pData(v$raw), by.x = "sample", by.y = "idx",
@@ -375,35 +383,5 @@ server <- function(input, output, session) {
 
   })
 
-  ## observeEvent(input$peak_show, {
-  ##   output$peak_fig <- renderUI(tagList(
-  ##     br(),
-  ##     withSpinner(plotlyOutput("peak_chrom_fig"))
-  ##   ))
-  ##   peak_info <- v$peak_sub[, .(fname, mzmin, mzmax, rtmin, rtmax)]
-  ##   if (anyDuplicated(peak_info$fname)) {
-  ##     peak_info <- peak_info[, .(mzmin = min(mzmin), mzmax = max(mzmax),
-  ##                                rtmin = min(rtmin), rtmax = max(rtmax)),
-  ##                            by = .(fname)]
-  ##   }
-  ##   full_rt_range <- c(min(peak_info$rtmin), max(peak_info$rtmax))
-  ##   p_peaklist <- list()
-  ##   for (i in seq_len(nrow(peak_info))) {
-  ##     idx <- which(v$fdata$file == peak_info$fname[i])
-  ##     p_peaklist[[i]] <- p_peak_density(
-  ##       v$fdata[idx, ],
-  ##       mzrange = c(peak_info$mzmin[i], peak_info$mzmax[i]),
-  ##       rtrange = full_rt_range,
-  ##       ## rt_offset = 3 * input$bw
-  ##       rt_offset = 20
-  ##     )
-  ##   }
-  ##   n_plots <- length(p_peaklist)
-  ##   n_cols <- ceiling(sqrt(n_plots))
-  ##   n_rows <- ceiling(n_plots/n_cols)
-  ##   output$peak_chrom_fig <- renderPlotly(
-  ##     subplot(p_peaklist, nrows = n_rows, margin = c(0.03, 0.03, 0.07, 0.07))
-  ##   )
-  ## })
 #################################################################################
 }

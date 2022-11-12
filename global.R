@@ -1,22 +1,31 @@
 library(shiny)
-library(shinyWidgets)
-library(shinyjs)
-library(shinycssloaders)
-library(bsplus)
-library(bslib)
-library(DT)
+## library(shinyWidgets)
+library(shinyjs) ## enable JS operations
+library(shinycssloaders) ## loading animation
+library(bsplus) ## add tooltip
+library(bslib) ## bootstrap theme
+library(DT) ## interface to JS library DataTables
 library(data.table)
 library(xcms)
 library(ggplot2)
-library(plotly)
-library(viridisLite)
+library(plotly) ## interactive graphic
+library(viridisLite) ## Viridis palette
 library(tools)
-options(shiny.maxRequestSize = 1000 * (1024**2))
-options(digits = 12)
+options(shiny.maxRequestSize = 1000 * (1024**2)) ## size limit for file upload
 source("plots.R")
 source("feature_detection.R")
 source("maintabs.R")
 
+################################################################################
+## Validate mass-spectrometry files
+################################################################################
+has_spectra <- function(x) {
+  all(MSnbase::hasSpectra(x))
+}
+
+################################################################################
+## Mandatory fields to activate XIC plot and feature detection buttons
+################################################################################
 mandatory_fields_preset <- c(
   "xic_mz_window", "xic_rt_min", "xic_rt_max"
 )
@@ -24,10 +33,6 @@ mandatory_fields_preset <- c(
 mandatory_fields_manual <- c(
   "xic_mz_min", "xic_mz_max", "xic_rt_min", "xic_rt_max"
 )
-
-has_spectra <- function(x) {
-  all(MSnbase::hasSpectra(x))
-}
 
 test_mandatory <- function(input, mandatory_fields) {
   all(
@@ -40,6 +45,9 @@ test_mandatory <- function(input, mandatory_fields) {
   )
 }
 
+################################################################################
+## Retrieve data from the XCMS object
+################################################################################
 get_df <- function(x) {
   ## `x` is supposed to be a single file MSnExp object
   is(x, "MSnExp")
@@ -48,6 +56,9 @@ get_df <- function(x) {
   d
 }
 
+################################################################################
+## Compound information to set m/z searching space
+################################################################################
 get_mzrange <- function(mz, ppm = 30) {
   delta <- ppm * mz / 1e6
   c(mz - delta, mz + delta)
@@ -62,6 +73,9 @@ get_compound_mzrange <- function(compound, compound_dat, ppm) {
 compound_dat <- fread("compound_info.csv")
 compound_dat[, id := paste(compound, adduct, sep = " ")]
 
+################################################################################
+## Machine-specific feature detection parameters
+################################################################################
 machines <- c(
   "UPLC / Q-Exactive", "UPLC / Orbitrap",
   "HPLC / Waters TOF", "HPLC / Ion Trap"

@@ -26,13 +26,6 @@ maintabs_ui <- function(fdata) {
                        choices = c("Relative Abundance", "Absolute Intensity"),
                        selected = "Relative Abundance")
       ),
-      ## actionButton("mass_plot", "Generate a plot"),
-      ## splitLayout(
-      ##   checkboxInput("collapse", "Collapse"),
-      ##   checkboxInput("bpc", "Show Base Peak Chromatogram"),
-      ##   cellWidths = 300,
-      ##   cellArgs = list(style = "padding-left: 10px")
-      ## ),
       withSpinner(plotlyOutput("massspec"))
     ),
     tabPanel(
