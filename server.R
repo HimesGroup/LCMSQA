@@ -238,9 +238,19 @@ server <- function(input, output, session) {
       fitgauss = fitgauss_method,
       noise = input$noise
     )
-    v$raw_sub <- filterMz(v$raw, mzr())
-    v$raw_sub <- filterRt(v$raw_sub, rtr())
+    v$raw_sub <- filterMz(
+      v$raw, c(mzr()[1] - 5, mzr()[2] + 5) ## extend m/z window
+    )
+    if (any(is.finite(rtr()))) {
+      v$raw_sub <- filterRt(
+        v$raw_sub, c(rtr()[1] - 20, rtr()[2] + 20) ## extend RT window
+      )
+    }
     m <- findChromPeaks(v$raw_sub, param = cpm)
+    m <- filterMz(m, mzr())
+    if (any(is.finite(rtr()))) {
+      m <- filterRt(m, rtr())
+    }
     v$peak <- chromPeaks(m)
     if (is.null(v$peak)) {
       showNotification(
@@ -262,7 +272,7 @@ server <- function(input, output, session) {
       if (nrow(featureDefinitions(v$res)) == 0) {
         showNotification(
           ui = paste0("No Features detected in the specified region! ",
-                      "Adjust peak picking parameters."),
+                      "Adjust peak grouping parameters."),
           duration = NULL, type = "error", id = "nopeak"
         )
         v$ui_nopeak <- TRUE
