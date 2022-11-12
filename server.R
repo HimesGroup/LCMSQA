@@ -160,19 +160,9 @@ server <- function(input, output, session) {
   observeEvent(v$fdata, {
     updateTabsetPanel(session, "tabs", selected = "Total Ion Current")
     output$tic <- renderPlotly({
-      if (!input$bpc) {
-        if (!input$collapse) {
-          ggplotly(p_chrom(v$fdata, type = "sum", facet = TRUE))
-        } else {
-          ggplotly(p_chrom(v$fdata, type = "sum", facet = FALSE))
-        }
-      } else {
-        if (!input$collapse) {
-          ggplotly(p_chrom(v$fdata, type = "max", facet = TRUE))
-        } else {
-          ggplotly(p_chrom(v$fdata, type = "max", facet = FALSE))
-        }
-      }
+      type <- if (input$bpc) "max" else "sum"
+      facet <- if (input$collapse) FALSE else TRUE
+      ggplotly(p_chrom(v$fdata, type = type, facet = facet))
     })
     observeEvent(input$plot_xic, {
       updateTabsetPanel(session, "tabs", selected = "Extracted Ion Chromatogram")
