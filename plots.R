@@ -95,28 +95,21 @@ p_trace <- function(x, mzrange, rtrange) {
 
 p_mass <- function(x, file, scan, yaxis) {
   d <- x[file == file & rt == scan]
+  setnames(d, old = c("mz", "i"), new = c("m/z", "Intensity"))
   if (yaxis == "Relative Abundance") {
-    s <- sum(d$i)
-    d[, i := 100 * (i / s)]
-    ## setnames(d, old = c("mz", "i"),
-    ##          new = c("m/z", "Relative Abundance"))
+    ## s <- sum(d$i)
+    s <- max(d$Intensity)
+    d[, Intensity := 100 * (Intensity / s)]
     ytitle <- c("Relative Abundance (%)")
 
   } else {
-    ## setnames(d, old = c("mz", "i"),
-    ##          new = c("m/z", "Intensity"))
     ytitle <- c("Intensity")
   }
-  ggplot(d, aes(x = mz, ymin = 0, ymax = i)) +
+  ggplot(d, aes(x = `m/z`, ymin = 0, ymax = Intensity)) +
     geom_linerange() +
     theme_bw() +
-    xlab("m/z") +
     ylab(ytitle) +
     theme(legend.position = "none")
-  ## ggplot(d, aes(x = `m/z`, ymin = 0, ymax = Intensity)) +
-  ##   geom_linerange() +
-  ##   theme_bw() +
-  ##   theme(legend.position = "none")
 }
 
 
