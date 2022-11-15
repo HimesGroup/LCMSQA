@@ -172,22 +172,41 @@ server <- function(input, output, session) {
         rtrange = rtr(),
         fname = v$fname
       )
-    })
-    output$xic <- renderPlotly({
       if (!is.null(v$xic)) {
-        tryCatch(
-          ## ggplotly(v$xic),
-          v$xic,
-          error = function(e) {
-            showNotification(
-              ui = "No data points are available!",
-              duration = 5, type = "error"
-            )
-            NULL
-          }
+        output$xic <- renderPlotly({
+          tryCatch(
+            v$xic,
+            error = function(e) {
+              showNotification(
+                ui = "No data points are available!",
+                duration = 5, type = "error"
+              )
+              NULL
+            }
+          )
+        })
+      } else {
+        showNotification(
+          ui = "No data points are available!",
+          duration = 5, type = "error"
         )
       }
     })
+    ## output$xic <- renderPlotly({
+    ##   if (!is.null(v$xic)) {
+    ##     tryCatch(
+    ##       ## ggplotly(v$xic),
+    ##       v$xic,
+    ##       error = function(e) {
+    ##         showNotification(
+    ##           ui = "No data points are available!",
+    ##           duration = 5, type = "error"
+    ##         )
+    ##         NULL
+    ##       }
+    ##     )
+    ##   }
+    ## })
   })
 
   ##############################################################################

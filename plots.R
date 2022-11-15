@@ -20,7 +20,7 @@ p_chrom <- function(x, type = c("sum", "max"), facet = TRUE) {
   p
 }
 
-p_xic <- function(x, rt_lim, int_lim, mz_lim, title = NULL) {
+p_xic <- function(x, mz_lim, rt_lim, int_lim, title = NULL) {
   if (is.null(title)) {
     title <- unique(x$File)
   }
@@ -33,9 +33,9 @@ p_xic <- function(x, rt_lim, int_lim, mz_lim, title = NULL) {
     theme_bw()
   p_bottom <- ggplot(x, aes(x = `Retention Time`, y = `m/z`, col = Intensity)) +
     geom_point() +
-    scale_color_viridis_c(limits = int_lim) +
     scale_x_continuous(limits = rt_lim) +
     scale_y_continuous(limits = mz_lim) +
+    scale_color_viridis_c(limits = int_lim) +
     theme_bw()
   subplot(
     layout(
@@ -58,6 +58,10 @@ p_xic <- function(x, rt_lim, int_lim, mz_lim, title = NULL) {
 p_xic_list <- function(x, mzrange, rtrange, fname) {
   x <- x[mz >= mzrange[1] & mz <= mzrange[2]]
   x <- x[rt >= rtrange[1] & rt <= rtrange[2]]
+  ## return NULL if no data is available
+  if (!nrow(x)) {
+    return(NULL)
+  }
   maxo <- max(x$i)
   if (is.infinite(rtrange[1])) {
     rtrange[1] <- 0
@@ -70,15 +74,20 @@ p_xic_list <- function(x, mzrange, rtrange, fname) {
            new = c("m/z", "Retention Time", "Intensity", "File"))
   p_list <- list()
   for (i in seq_along(fname)) {
-    idx <- which(x$File == fname[i])
-    xs <- x[idx, ]
-    p_list[[i]] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
-                         int_lim = int_lim, fname[i])
+    xs <- x[File == fname[i]]
+    if (nrow(xs)) {
+      p_list[[i]] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
+                           int_lim = int_lim, fname[i])
+    }
   }
   n_plots <- length(p_list)
-  n_cols <- ceiling(sqrt(n_plots))
-  n_rows <- ceiling(n_plots/n_cols)
-  subplot(p_list, nrows = n_rows, shareX = TRUE, titleY = TRUE, margin = 0.05)
+  if (n_plots) {
+    n_cols <- ceiling(sqrt(n_plots))
+    n_rows <- ceiling(n_plots/n_cols)
+    subplot(p_list, nrows = n_rows, shareX = TRUE, titleY = TRUE, margin = 0.05)
+  } else {
+    NULL
+  }
 }
 
 p_trace <- function(x, mzrange, rtrange) {
@@ -111,7 +120,6 @@ p_mass <- function(x, file, scan, yaxis) {
     ylab(ytitle) +
     theme(legend.position = "none")
 }
-
 
 p_feature_bar <- function(x, title) {
   x[, Area := log2(Area)]
