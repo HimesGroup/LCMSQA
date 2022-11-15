@@ -166,16 +166,18 @@ server <- function(input, output, session) {
     })
     observeEvent(input$plot_xic, {
       updateTabsetPanel(session, "tabs", selected = "Extracted Ion Chromatogram")
-      v$xic <- p_xic(
+      v$xic <- p_xic_list(
         v$fdata,
         mzrange = mzr(),
-        rtrange = rtr()
+        rtrange = rtr(),
+        fname = v$fname
       )
     })
     output$xic <- renderPlotly({
       if (!is.null(v$xic)) {
         tryCatch(
-          ggplotly(v$xic),
+          ## ggplotly(v$xic),
+          v$xic,
           error = function(e) {
             showNotification(
               ui = "No data points are available!",

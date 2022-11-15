@@ -20,12 +20,73 @@ p_chrom <- function(x, type = c("sum", "max"), facet = TRUE) {
   p
 }
 
-p_xic <- function(x, mzrange, rtrange) {
+p_xic <- function(x, rt_lim, int_lim, mz_lim, title = NULL) {
+  if (is.null(title)) {
+    title <- unique(x$File)
+  }
+  p_top <- ggplot(x, aes(x = `Retention Time`, y = Intensity, col = Intensity)) +
+    geom_point() +
+    facet_wrap(~ File) +
+    scale_x_continuous(limits = rt_lim) +
+    scale_y_continuous(limits = int_lim) +
+    scale_color_viridis_c(limits = int_lim) +
+    theme_bw()
+  p_bottom <- ggplot(x, aes(x = `Retention Time`, y = `m/z`, col = Intensity)) +
+    geom_point() +
+    scale_color_viridis_c(limits = int_lim) +
+    scale_x_continuous(limits = rt_lim) +
+    scale_y_continuous(limits = mz_lim) +
+    theme_bw()
+  subplot(
+    layout(
+      ggplotly(p_top),
+      yaxis = list(title = list(text = "Intensity", font = list(size = 14)))
+    ),
+    layout(
+      ggplotly(p_bottom),
+      yaxis = list(title = list(text = "m/z", font = list(size = 14)))
+    ),
+    ## add_annotations(
+    ##   ggplotly(p_top), text = title, x = 0.5, y = 1.2,
+    ##   xref = "paper", yref = "paper", xanchor = "center", yanchor = "top",
+    ##   showarrow = FALSE, font = list(size = 15)
+    ## ),
+    ## p_bottom,
+    nrows = 2, shareX = TRUE, titleY = TRUE)
+}
+
+p_xic_list <- function(x, mzrange, rtrange, fname) {
   x <- x[mz >= mzrange[1] & mz <= mzrange[2]]
   x <- x[rt >= rtrange[1] & rt <= rtrange[2]]
-  setnames(x, old = c("rt", "i", "file"),
-           new = c("Retention Time", "Intensity", "File"))
-  ggplot(x, aes(x = `Retention Time`, y = Intensity, col = Intensity)) +
+  maxo <- max(x$i)
+  if (is.infinite(rtrange[1])) {
+    rtrange[1] <- 0
+  }
+  if (is.infinite(rtrange[2])) {
+    rtrange[2] <- max(x$rt) + 20
+  }
+  int_lim <- c(0, 1.1 * maxo)
+  setnames(x, old = c("mz", "rt", "i", "file"),
+           new = c("m/z", "Retention Time", "Intensity", "File"))
+  p_list <- list()
+  for (i in seq_along(fname)) {
+    idx <- which(x$File == fname[i])
+    xs <- x[idx, ]
+    p_list[[i]] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
+                         int_lim = int_lim, fname[i])
+  }
+  n_plots <- length(p_list)
+  n_cols <- ceiling(sqrt(n_plots))
+  n_rows <- ceiling(n_plots/n_cols)
+  subplot(p_list, nrows = n_rows, shareX = TRUE, titleY = TRUE, margin = 0.05)
+}
+
+p_trace <- function(x, mzrange, rtrange) {
+  x <- x[mz >= mzrange[1] & mz <= mzrange[2]]
+  x <- x[rt >= rtrange[1] & rt <= rtrange[2]]
+  setnames(x, old = c("mz", "rt", "i", "file"),
+           new = c("m/z", "Retention Time", "Intensity", "File"))
+  ggplot(x, aes(x = `Retention Time`, y = `m/z`, col = Intensity)) +
     geom_point() +
     facet_wrap(~ File) +
     scale_color_viridis_c() +
