@@ -216,7 +216,9 @@ server <- function(input, output, session) {
     input$fileselect
     input$ms_int_cut
   }, {
-    v$scan_choices <- unique(v$fdata[file == input$fileselect & i >= input$ms_int_cut]$rt)
+    v$scan_choices <- unique(
+      v$fdata[file == input$fileselect & i >= input$ms_int_cut]$rt
+    )
     updateSelectizeInput(session, "scan", choices = v$scan_choices,
                          selected = v$scan_choices[1], server = TRUE)
   })
@@ -225,16 +227,18 @@ server <- function(input, output, session) {
     input$scan
     input$yaxis
   }, {
-    v$massspec <- p_mass(v$fdata, file = input$fileselect, scan = input$scan,
-                         yaxis = input$yaxis)
-    output$massspec <- renderPlotly({
-      if (!is.null(v$massspec)) {
-        tryCatch(
-          ggplotly(v$massspec),
-          error = function(e) NULL
-        )
-      }
-    })
+    if (!is.null(input$scan) && input$scan != "") {
+      v$massspec <- p_mass(v$fdata, file = input$fileselect, scan = input$scan,
+                           yaxis = input$yaxis)
+      output$massspec <- renderPlotly({
+        if (!is.null(v$massspec)) {
+          tryCatch(
+            ggplotly(v$massspec),
+            error = function(e) NULL
+          )
+        }
+      })
+    }
   })
 
   ##############################################################################
