@@ -20,6 +20,25 @@ p_chrom <- function(x, type = c("sum", "max"), facet = TRUE) {
   p
 }
 
+p_massspec <- function(x, file, scan, yaxis) {
+  d <- x[file == file & rt == scan]
+  setnames(d, old = c("mz", "i"), new = c("m/z", "Intensity"))
+  if (yaxis == "Relative Abundance") {
+    ## s <- sum(d$i)
+    s <- max(d$Intensity)
+    d[, Intensity := 100 * (Intensity / s)]
+    ytitle <- c("Relative Abundance (%)")
+
+  } else {
+    ytitle <- c("Intensity")
+  }
+  ggplot(d, aes(x = `m/z`, ymin = 0, ymax = Intensity)) +
+    geom_linerange() +
+    theme_bw() +
+    ylab(ytitle) +
+    theme(legend.position = "none")
+}
+
 p_xic <- function(x, mz_lim, rt_lim, int_lim, title = NULL) {
   if (is.null(title)) {
     title <- unique(x$File)
@@ -46,12 +65,6 @@ p_xic <- function(x, mz_lim, rt_lim, int_lim, title = NULL) {
       ggplotly(p_bottom),
       yaxis = list(title = list(text = "m/z", font = list(size = 14)))
     ),
-    ## add_annotations(
-    ##   ggplotly(p_top), text = title, x = 0.5, y = 1.2,
-    ##   xref = "paper", yref = "paper", xanchor = "center", yanchor = "top",
-    ##   showarrow = FALSE, font = list(size = 15)
-    ## ),
-    ## p_bottom,
     nrows = 2, shareX = TRUE, titleY = TRUE)
 }
 
@@ -83,45 +96,14 @@ p_xic_list <- function(x, mzrange, rtrange, fname) {
   n_plots <- length(p_list)
   if (n_plots) {
     n_cols <- ceiling(sqrt(n_plots))
-    n_rows <- ceiling(n_plots/n_cols)
+    n_rows <- ceiling(n_plots / n_cols)
     subplot(p_list, nrows = n_rows, shareX = TRUE, titleY = TRUE, margin = 0.05)
   } else {
     NULL
   }
 }
 
-p_trace <- function(x, mzrange, rtrange) {
-  x <- x[mz >= mzrange[1] & mz <= mzrange[2]]
-  x <- x[rt >= rtrange[1] & rt <= rtrange[2]]
-  setnames(x, old = c("mz", "rt", "i", "file"),
-           new = c("m/z", "Retention Time", "Intensity", "File"))
-  ggplot(x, aes(x = `Retention Time`, y = `m/z`, col = Intensity)) +
-    geom_point() +
-    facet_wrap(~ File) +
-    scale_color_viridis_c() +
-    theme_bw()
-}
-
-p_mass <- function(x, file, scan, yaxis) {
-  d <- x[file == file & rt == scan]
-  setnames(d, old = c("mz", "i"), new = c("m/z", "Intensity"))
-  if (yaxis == "Relative Abundance") {
-    ## s <- sum(d$i)
-    s <- max(d$Intensity)
-    d[, Intensity := 100 * (Intensity / s)]
-    ytitle <- c("Relative Abundance (%)")
-
-  } else {
-    ytitle <- c("Intensity")
-  }
-  ggplot(d, aes(x = `m/z`, ymin = 0, ymax = Intensity)) +
-    geom_linerange() +
-    theme_bw() +
-    ylab(ytitle) +
-    theme(legend.position = "none")
-}
-
-p_feature_bar <- function(x, title) {
+p_feature_area <- function(x, title) {
   x[, Area := log2(Area)]
   x[, label := sprintf("%.2f", Area)]
   title <- NULL
@@ -149,7 +131,7 @@ p_feature_bar <- function(x, title) {
           axis.text.x = element_text(angle = 45))
 }
 
-p_peak_density <- function(x, mzrange, rtrange, rt_offset) {
+p_peak <- function(x, mzrange, rtrange, rt_offset) {
   x <- x[mz >= mzrange[1] & mz <= mzrange[2]]
   xlim <- c(max(0, (rtrange[1] - rt_offset)),
             rtrange[2] + rt_offset)
@@ -172,4 +154,24 @@ p_peak_density <- function(x, mzrange, rtrange, rt_offset) {
     scale_x_continuous(limits = xlim) +
     theme_bw() +
     theme(legend.position = "none")
+}
+
+p_peak_list <- function(x, peak_info) {
+  rtrange <- c(min(peak_info$rtmin), max(peak_info$rtmax))
+  p_list <- list()
+  for (i in seq_along(peak_info$fname)) {
+    idx <- which(x$file == peak_info$fname[i])
+    xs <- x[idx, ]
+    p_list[[i]] <- p_peak(
+      xs,
+      mzrange = c(peak_info$mzmin[i], peak_info$mzmax[i]),
+      rtrange = rtrange,
+      ## rt_offset = 3 * input$bw
+      rt_offset = 20
+    )
+  }
+  n_plots <- length(p_list)
+  n_cols <- ceiling(sqrt(n_plots))
+  n_rows <- ceiling(n_plots / n_cols)
+  subplot(p_list, nrows = n_rows, margin = c(0.03, 0.03, 0.07, 0.07))
 }

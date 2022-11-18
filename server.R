@@ -228,8 +228,10 @@ server <- function(input, output, session) {
     input$yaxis
   }, {
     if (!is.null(input$scan) && input$scan != "") {
-      v$massspec <- p_mass(v$fdata, file = input$fileselect, scan = input$scan,
-                           yaxis = input$yaxis)
+      v$massspec <- p_massspec(
+        v$fdata, file = input$fileselect,
+        scan = input$scan, yaxis = input$yaxis
+      )
       output$massspec <- renderPlotly({
         if (!is.null(v$massspec)) {
           tryCatch(
@@ -332,18 +334,20 @@ server <- function(input, output, session) {
   ##############################################################################
   observeEvent(input$feature_tbl_rows_selected, {
     idx <- input$feature_tbl_rows_selected
+
+    ## Bar plot for feature intensities
     output$feature_fig <- renderUI(tagList(
       withSpinner(plotlyOutput("feature_bar"))
     ))
-    ## Bar plot for feature intensities
     dw <- v$feature[idx, -c(1:11)]
     dl <- melt(dw, measure.vars = colnames(dw),
                variable.name = "File", value.name = "Area")
     dl[, File := factor(File, levels = v$fname)]
     output$feature_bar <- renderPlotly({
-      ggplotly(p_feature_bar(dl, title))
+      ggplotly(p_feature_area(dl, title))
     })
 
+    ## Feature-peak table
     output$peak_tbl <- renderUI(tagList(
       h5("Peaks for the Selected Feature", style = "color:orange"),
       br(),
@@ -377,25 +381,7 @@ server <- function(input, output, session) {
                                  rtmin = min(rtmin), rtmax = max(rtmax)),
                              by = .(fname)]
     }
-    full_rt_range <- c(min(peak_info$rtmin), max(peak_info$rtmax))
-    p_peaklist <- list()
-    for (i in seq_len(nrow(peak_info))) {
-      idx <- which(v$fdata$file == peak_info$fname[i])
-      p_peaklist[[i]] <- p_peak_density(
-        v$fdata[idx, ],
-        mzrange = c(peak_info$mzmin[i], peak_info$mzmax[i]),
-        rtrange = full_rt_range,
-        ## rt_offset = 3 * input$bw
-        rt_offset = 20
-      )
-    }
-    n_plots <- length(p_peaklist)
-    n_cols <- ceiling(sqrt(n_plots))
-    n_rows <- ceiling(n_plots/n_cols)
-    output$peak_chrom_fig <- renderPlotly(
-      subplot(p_peaklist, nrows = n_rows, margin = c(0.03, 0.03, 0.07, 0.07))
-    )
-
+    output$peak_chrom_fig <- renderPlotly(p_peak_list(v$fdata, peak_info))
   })
 
 #################################################################################
