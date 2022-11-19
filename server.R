@@ -23,10 +23,10 @@ server <- function(input, output, session) {
   ##############################################################################
   ## Extend input for intermediate states
   ##############################################################################
-  v <- reactiveValues(fname = NULL, raw = NULL, raw_sub = NULL, fdata = NULL,
-                      manual = FALSE, xic = NULL, massspec = NULL,
-                      scan_choices = NULL, res = NULL, peak = NULL,
-                      ui_nopeak = FALSE, feature = NULL, peak_sub = NULL)
+  v <- reactiveValues(fname = NULL, raw = NULL, fdata = NULL,
+                      xic = NULL, massspec = NULL,
+                      scan_choices = NULL, peak = NULL,
+                      ui_nopeak = FALSE, feature = NULL)
 
   ##############################################################################
   ## Conditional UI for m/z specification
@@ -264,15 +264,15 @@ server <- function(input, output, session) {
       fitgauss = fitgauss_method,
       noise = input$noise
     )
-    v$raw_sub <- filterMz(
+    raw_sub <- filterMz(
       v$raw, c(mzr()[1] - 5, mzr()[2] + 5) ## extend m/z window
     )
     if (any(is.finite(rtr()))) {
-      v$raw_sub <- filterRt(
-        v$raw_sub, c(rtr()[1] - 20, rtr()[2] + 20) ## extend RT window
+      raw_sub <- filterRt(
+        raw_sub, c(rtr()[1] - 20, rtr()[2] + 20) ## extend RT window
       )
     }
-    m <- findChromPeaks(v$raw_sub, param = cpm)
+    m <- findChromPeaks(raw_sub, param = cpm)
     m <- filterMz(m, mzr())
     if (any(is.finite(rtr()))) {
       m <- filterRt(m, rtr())
@@ -294,8 +294,8 @@ server <- function(input, output, session) {
         binSize = input$binsize,
         maxFeatures = 100
       )
-      v$res <- groupChromPeaks(m, pdp)
-      if (nrow(featureDefinitions(v$res)) == 0) {
+      res <- groupChromPeaks(m, pdp)
+      if (nrow(featureDefinitions(res)) == 0) {
         showNotification(
           ui = paste0("No Features detected in the specified region! ",
                       "Adjust peak grouping parameters."),
@@ -303,9 +303,9 @@ server <- function(input, output, session) {
         )
         v$ui_nopeak <- TRUE
       } else {
-        fdef <- as.data.table(featureDefinitions(v$res), keep.rownames = "feature")
-        fval <- as.data.table(featureValues(v$res), keep.rownames = "feature")
-        colnames(fval)[-1] <- as.character(pData(v$raw_sub)$fname)
+        fdef <- as.data.table(featureDefinitions(res), keep.rownames = "feature")
+        fval <- as.data.table(featureValues(res), keep.rownames = "feature")
+        colnames(fval)[-1] <- as.character(pData(raw_sub)$fname)
         mz_cols <- c("mzmed", "mzmin", "mzmax")
         rt_cols <- c("rtmed", "rtmin", "rtmax")
         v$feature <- merge(fdef, fval, sort = FALSE)
@@ -354,9 +354,9 @@ server <- function(input, output, session) {
       DTOutput("feature_peak_map")
     ))
     peaklist <- as.data.table(v$peak)[v$feature$peakidx[[idx]], ]
-    v$peak_sub <- merge(peaklist, pData(v$raw), by.x = "sample", by.y = "idx",
-                        sort = FALSE)
-    peak_tbl <- copy(v$peak_sub)
+    peak_sub <- merge(peaklist, pData(v$raw), by.x = "sample", by.y = "idx",
+                      sort = FALSE)
+    peak_tbl <- copy(peak_sub)
     mz_cols <- c("mz", "mzmin", "mzmax")
     rt_cols <- c("rt", "rtmin", "rtmax")
     peak_tbl[, (mz_cols) := lapply(.SD, function(x) sprintf("%.4f", x)),
@@ -375,7 +375,7 @@ server <- function(input, output, session) {
       br(),
       withSpinner(plotlyOutput("peak_chrom_fig"))
     ))
-    peak_info <- v$peak_sub[, .(fname, mzmin, mzmax, rtmin, rtmax)]
+    peak_info <- peak_sub[, .(fname, mzmin, mzmax, rtmin, rtmax)]
     if (anyDuplicated(peak_info$fname)) {
       peak_info <- peak_info[, .(mzmin = min(mzmin), mzmax = max(mzmax),
                                  rtmin = min(rtmin), rtmax = max(rtmax)),
