@@ -4,6 +4,12 @@ maintabs_ui <- function(fdata) {
     tabPanel(
       "Total Ion Current",
       br(),
+      pickerInput(
+        "tic_files", "Files",
+        choices = unique(as.character(fdata$file)),
+        selected = unique(as.character(fdata$file)),
+        multiple = TRUE, options = list(`actions-box` = TRUE)
+      ),
       splitLayout(
         checkboxInput("collapse", "Collapse"),
         checkboxInput("bpc", "Show Base Peak Chromatogram"),

@@ -159,10 +159,15 @@ server <- function(input, output, session) {
   ##############################################################################
   observeEvent(v$fdata, {
     updateTabsetPanel(session, "tabs", selected = "Total Ion Current")
-    output$tic <- renderPlotly({
-      type <- if (input$bpc) "max" else "sum"
-      facet <- if (input$collapse) FALSE else TRUE
-      ggplotly(p_chrom(v$fdata, type = type, facet = facet))
+    observeEvent(input$tic_files, {
+      xs <- v$fdata[file %in% input$tic_files]
+      if (nrow(xs)) {
+        output$tic <- renderPlotly({
+          type <- if (input$bpc) "max" else "sum"
+          facet <- if (input$collapse) FALSE else TRUE
+          ggplotly(p_chrom(xs, type = type, facet = facet))
+        })
+      }
     })
   })
 
