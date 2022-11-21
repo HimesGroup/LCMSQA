@@ -155,7 +155,7 @@ server <- function(input, output, session) {
   })
 
   ##############################################################################
-  ## TIC and XIC plot
+  ## TIC plot
   ##############################################################################
   observeEvent(v$fdata, {
     updateTabsetPanel(session, "tabs", selected = "Total Ion Current")
@@ -164,60 +164,55 @@ server <- function(input, output, session) {
       facet <- if (input$collapse) FALSE else TRUE
       ggplotly(p_chrom(v$fdata, type = type, facet = facet))
     })
+  })
+
+  ##############################################################################
+  ## XIC plot
+  ##############################################################################
+  observeEvent(v$fdata, {
+    output$xic <- renderPlotly(NULL)
     observeEvent(input$plot_xic, {
       updateTabsetPanel(session, "tabs", selected = "Extracted Ion Chromatogram")
-      v$xic <- p_xic_list(
-        v$fdata,
-        mzrange = mzr(),
-        rtrange = rtr(),
-        fname = v$fname
-      )
-      if (!is.null(v$xic)) {
-        output$xic <- renderPlotly({
-          tryCatch(
-            v$xic,
-            error = function(e) {
-              showNotification(
-                ui = "No data points are available!",
-                duration = 5, type = "error"
-              )
-              NULL
-            }
-          )
-        })
-      } else {
-        showNotification(
-          ui = "No data points are available!",
-          duration = 5, type = "error"
+      observeEvent(input$xic_files, {
+        xic_file_idx <- which(v$fdata$file %in% input$xic_files)
+        v$xic <- p_xic_list(
+          v$fdata[xic_file_idx, ],
+          mzrange = mzr(),
+          rtrange = rtr(),
+          fname = v$fname
         )
-      }
+        if (!is.null(v$xic)) {
+          output$xic <- renderPlotly({
+            tryCatch(
+              v$xic,
+              error = function(e) {
+                showNotification(
+                  ui = "No data points are available!",
+                  duration = 5, type = "error"
+                )
+                NULL
+              }
+            )
+          })
+        } else {
+          showNotification(
+            ui = "No data points are available!",
+            duration = 5, type = "error"
+          )
+        }
+      })
     })
-    ## output$xic <- renderPlotly({
-    ##   if (!is.null(v$xic)) {
-    ##     tryCatch(
-    ##       ## ggplotly(v$xic),
-    ##       v$xic,
-    ##       error = function(e) {
-    ##         showNotification(
-    ##           ui = "No data points are available!",
-    ##           duration = 5, type = "error"
-    ##         )
-    ##         NULL
-    ##       }
-    ##     )
-    ##   }
-    ## })
   })
 
   ##############################################################################
   ## Mass spectrum plot
   ##############################################################################
   observeEvent({
-    input$fileselect
+    input$massspec_file
     input$ms_int_cut
   }, {
     v$scan_choices <- unique(
-      v$fdata[file == input$fileselect & i >= input$ms_int_cut]$rt
+      v$fdata[file == input$massspec_file & i >= input$ms_int_cut]$rt
     )
     updateSelectizeInput(session, "scan", choices = v$scan_choices,
                          selected = v$scan_choices[1], server = TRUE)
@@ -229,7 +224,7 @@ server <- function(input, output, session) {
   }, {
     if (!is.null(input$scan) && input$scan != "") {
       v$massspec <- p_massspec(
-        v$fdata, file = input$fileselect,
+        v$fdata, file = input$massspec_file,
         scan = input$scan, yaxis = input$yaxis
       )
       output$massspec <- renderPlotly({

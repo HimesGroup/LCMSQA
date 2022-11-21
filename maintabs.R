@@ -16,8 +16,10 @@ maintabs_ui <- function(fdata) {
       "Mass Spectrum",
       br(),
       fluidRow(
-        selectizeInput("fileselect", "File", choices = unique(fdata$file),
-                       selected = unique(fdata$file)[1]),
+        selectizeInput(
+          "massspec_file", "File", choices = unique(as.character(fdata$file)),
+          selected = unique(as.character(fdata$file))[1]
+        ),
         numericInput("ms_int_cut", "Intensity Threshold", value = 10000)
       ),
       fluidRow(
@@ -31,6 +33,12 @@ maintabs_ui <- function(fdata) {
     tabPanel(
       "Extracted Ion Chromatogram",
       br(),
+      pickerInput(
+        "xic_files", "Files",
+        choices = unique(as.character(fdata$file)),
+        selected = unique(as.character(fdata$file)),
+        multiple = TRUE, options = list(`actions-box` = TRUE)
+      ),
       withSpinner(plotlyOutput("xic"))
     ),
     tabPanel(

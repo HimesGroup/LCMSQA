@@ -89,8 +89,8 @@ p_xic_list <- function(x, mzrange, rtrange, fname) {
   for (i in seq_along(fname)) {
     xs <- x[File == fname[i]]
     if (nrow(xs)) {
-      p_list[[i]] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
-                           int_lim = int_lim, fname[i])
+      p_list[fname[i]] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
+                                int_lim = int_lim, fname[i])
     }
   }
   n_plots <- length(p_list)

@@ -1,5 +1,5 @@
 library(shiny)
-## library(shinyWidgets)
+library(shinyWidgets) ## picker input (select-all option)
 library(shinyjs) ## enable JS operations
 library(shinycssloaders) ## loading animation
 library(bsplus) ## add tooltip
