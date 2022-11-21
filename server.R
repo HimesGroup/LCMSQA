@@ -103,7 +103,6 @@ server <- function(input, output, session) {
   pre_peak_r <- reactive(get_machine_val(machine_r(), machines, machines_pre_peak))
   pre_int_r <- reactive(get_machine_val(machine_r(), machines, machines_pre_int))
   bw_r <- reactive(get_machine_val(machine_r(), machines, machines_bw))
-  ## minfrac_r <- reactive(get_machine_val(machine_r(), machines, machines_minfrac))
   binsize_r <- reactive(get_machine_val(machine_r(), machines, machines_binsize))
 
   observe({
@@ -115,7 +114,6 @@ server <- function(input, output, session) {
     updateNumericInput(session, "pre_peak", value = pre_peak_r())
     updateNumericInput(session, "pre_int", value = pre_int_r())
     updateNumericInput(session, "bw", value = bw_r())
-    ## updateNumericInput(session, "minfrac", value = minfrac_r())
     updateNumericInput(session, "binsize", value = binsize_r())
   })
 
@@ -125,7 +123,6 @@ server <- function(input, output, session) {
   observeEvent(flist(), {
     v$fname <- file_path_sans_ext(flist()$name)
     withProgress(message = "Reading Data...", value = 0, {
-      ## v$fname <- file_path_sans_ext(flist()$name)
       v$raw <- readMSData(
         flist()$datapath,
         pdata = new(
@@ -192,21 +189,11 @@ server <- function(input, output, session) {
         if (!is.null(v$xic)) {
           output$xic <- renderPlotly({
             v$xic
-            ## tryCatch(
-            ##   v$xic,
-            ##   error = function(e) {
-            ##     showNotification(
-            ##       ui = "No data points are available!",
-            ##       duration = 5, type = "error"
-            ##     )
-            ##     NULL
-            ##   }
-            ## )
           })
         } else {
           showNotification(
             ui = "No data points are available!",
-            duration = 5, type = "error"
+            duration = 3, type = "error"
           )
         }
       })
@@ -257,6 +244,7 @@ server <- function(input, output, session) {
     }
     integrate_method <- ifelse(input$integrate == "Mexican Hat", 1L, 2L)
     fitgauss_method <- ifelse(input$gauss == "False", FALSE, TRUE)
+    showModal(modalDialog("Detecting features...", footer = NULL, size = "l"))
     cpm <- CentWaveParam(
       ppm = input$ppm,
       peakwidth = input$peakwidth,
@@ -331,6 +319,7 @@ server <- function(input, output, session) {
         )
       }
     }
+    removeModal()
   })
 
   ##############################################################################
