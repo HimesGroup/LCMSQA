@@ -86,11 +86,20 @@ p_xic_list <- function(x, mzrange, rtrange, fname) {
   setnames(x, old = c("mz", "rt", "i", "file"),
            new = c("m/z", "Retention Time", "Intensity", "File"))
   p_list <- list()
-  for (i in seq_along(fname)) {
-    xs <- x[File == fname[i]]
+  ## for (i in seq_along(fname)) {
+  ##   xs <- x[File == fname[i]]
+  ##   if (nrow(xs)) {
+  ##     p_list[fname[i]] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
+  ##                               int_lim = int_lim, fname[i])
+  ##   }
+  ## }
+  for (i in fname) {
+    xs <- x[File == i]
     if (nrow(xs)) {
-      p_list[fname[i]] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
-                                int_lim = int_lim, fname[i])
+      suppressWarnings(
+        p_list[i] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
+                           int_lim = int_lim, i)
+      )
     }
   }
   n_plots <- length(p_list)

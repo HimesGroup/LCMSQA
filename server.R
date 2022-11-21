@@ -173,26 +173,30 @@ server <- function(input, output, session) {
     output$xic <- renderPlotly(NULL)
     observeEvent(input$plot_xic, {
       updateTabsetPanel(session, "tabs", selected = "Extracted Ion Chromatogram")
+      updatePickerInput(
+        session, "xic_files",
+        selected = unique(as.character(v$fdata$file))
+      )
       observeEvent(input$xic_files, {
-        xic_file_idx <- which(v$fdata$file %in% input$xic_files)
         v$xic <- p_xic_list(
-          v$fdata[xic_file_idx, ],
+          v$fdata[file %in% input$xic_files],
           mzrange = mzr(),
           rtrange = rtr(),
           fname = v$fname
         )
         if (!is.null(v$xic)) {
           output$xic <- renderPlotly({
-            tryCatch(
-              v$xic,
-              error = function(e) {
-                showNotification(
-                  ui = "No data points are available!",
-                  duration = 5, type = "error"
-                )
-                NULL
-              }
-            )
+            v$xic
+            ## tryCatch(
+            ##   v$xic,
+            ##   error = function(e) {
+            ##     showNotification(
+            ##       ui = "No data points are available!",
+            ##       duration = 5, type = "error"
+            ##     )
+            ##     NULL
+            ##   }
+            ## )
           })
         } else {
           showNotification(
