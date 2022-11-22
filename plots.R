@@ -85,7 +85,7 @@ p_xic_list <- function(x, mzrange, rtrange, fname) {
   int_lim <- c(0, 1.1 * maxo)
   setnames(x, old = c("mz", "rt", "i", "file"),
            new = c("m/z", "Retention Time", "Intensity", "File"))
-  p_list <- list()
+  ## p_list <- list()
   ## for (i in seq_along(fname)) {
   ##   xs <- x[File == fname[i]]
   ##   if (nrow(xs)) {
@@ -93,15 +93,25 @@ p_xic_list <- function(x, mzrange, rtrange, fname) {
   ##                               int_lim = int_lim, fname[i])
   ##   }
   ## }
-  for (i in fname) {
+  ## for (i in fname) {
+  ##   xs <- x[File == i]
+  ##   if (nrow(xs)) {
+  ##     suppressWarnings(
+  ##       p_list[i] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
+  ##                          int_lim = int_lim, i)
+  ##     )
+  ##   }
+  ## }
+  p_list <- lapply(fname, function(i) {
     xs <- x[File == i]
     if (nrow(xs)) {
-      suppressWarnings(
-        p_list[i] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
-                           int_lim = int_lim, i)
-      )
+      p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
+            int_lim = int_lim, i)
+    } else {
+      NULL
     }
-  }
+  })
+  p_list <- p_list[!sapply(p_list, is.null)] ## remove NULL entries from the list
   n_plots <- length(p_list)
   if (n_plots) {
     n_cols <- ceiling(sqrt(n_plots))
