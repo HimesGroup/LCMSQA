@@ -310,10 +310,13 @@ server <- function(input, output, session) {
           new = c("m/z apex median", "m/z apex min", "m/z apex max",
                   "time apex median", "time apex min", "time apex max"))
         output$feature_tbl <- renderDT(
-          ## datatable(feature_tbl[, c(1, 4)], selection = "single")
           datatable(
             feature_tbl[, c(1, 4)],
-            selection = list(mode = "single", selected = 1, target = "row")
+            selection = list(mode = "single", selected = 1, target = "row"),
+            extensions = "Buttons",
+            options = list(
+              dom = "Bfrtip", buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+            )
           )
         )
       }
@@ -360,7 +363,16 @@ server <- function(input, output, session) {
     peak_tbl <- peak_tbl[, ..keep_cols]
     setnames(peak_tbl, new = c("file", "m/z", "m/z min", "m/z max",
                                "time", "time min", "time max", "log2 area"))
-    output$feature_peak_map <- renderDT(datatable(peak_tbl, selection = "none"))
+    output$feature_peak_map <- renderDT(
+      datatable(
+        peak_tbl,
+        selection = "none",
+        extensions = "Buttons",
+        options = list(
+          dom = "Bfrtip", buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+        )
+      )
+    )
 
     ## Peak display
     output$peak_fig <- renderUI(tagList(
