@@ -1,4 +1,10 @@
-p_chrom <- function(x, type = c("sum", "max"), facet = TRUE) {
+get_multp_nrow <- function(p_list) {
+  n_plots <- length(p_list)
+  n_cols <- ceiling(sqrt(n_plots))
+  ceiling(n_plots / n_cols)
+}
+
+p_tic <- function(x, type = c("sum", "max"), facet = TRUE) {
   type <- match.arg(type)
   if (type == "sum") {
     d <- x[, .(Intensity = sum(i)), by = .(file, rt)]
@@ -39,19 +45,23 @@ p_massspec <- function(x, file, scan, yaxis) {
     theme(legend.position = "none")
 }
 
-p_xic <- function(x, mz_lim, rt_lim, int_lim, title = NULL) {
-  if (is.null(title)) {
-    title <- unique(x$File)
+p_xic <- function(x, mz_lim, rt_lim, int_lim, blank = FALSE) {
+  p_top <- ggplot(x, aes(x = `Retention Time`, y = Intensity, col = Intensity))
+  p_bottom <- ggplot(x, aes(x = `Retention Time`, y = `m/z`, col = Intensity))
+  if (!blank) {
+    p_top <- p_top + geom_point()
+    p_bottom <- p_bottom + geom_point()
+  } else {
+    p_top <- p_top + geom_blank()
+    p_bottom <- p_bottom + geom_blank()
   }
-  p_top <- ggplot(x, aes(x = `Retention Time`, y = Intensity, col = Intensity)) +
-    geom_point() +
+  p_top <- p_top +
     facet_wrap(~ File) +
     scale_x_continuous(limits = rt_lim) +
     scale_y_continuous(limits = int_lim) +
     scale_color_viridis_c(limits = int_lim) +
     theme_bw()
-  p_bottom <- ggplot(x, aes(x = `Retention Time`, y = `m/z`, col = Intensity)) +
-    geom_point() +
+  p_bottom <- p_bottom +
     scale_x_continuous(limits = rt_lim) +
     scale_y_continuous(limits = mz_lim) +
     scale_color_viridis_c(limits = int_lim) +
@@ -65,61 +75,51 @@ p_xic <- function(x, mz_lim, rt_lim, int_lim, title = NULL) {
       ggplotly(p_bottom),
       yaxis = list(title = list(text = "m/z", font = list(size = 14)))
     ),
-    nrows = 2, shareX = TRUE, titleY = TRUE)
+    nrows = 2, shareX = TRUE, titleY = TRUE, heights = c(0.6, 0.4)
+  )
 }
 
 p_xic_list <- function(x, mzrange, rtrange, fname) {
   x <- x[mz >= mzrange[1] & mz <= mzrange[2]]
   x <- x[rt >= rtrange[1] & rt <= rtrange[2]]
-  ## return NULL if no data is available
   if (!nrow(x)) {
-    return(NULL)
+    ## create dummy data when no data for all selected files
+    x <- data.table(
+      mz = -99, rt = NA_integer_, i = NA_integer_, file = fname
+    )
+    int_lim = c(0, 100)
+  } else {
+    maxo <- max(x$i)
+    int_lim <- c(0, 1.1 * maxo)
   }
-  maxo <- max(x$i)
-  if (is.infinite(rtrange[1])) {
-    rtrange[1] <- 0
-  }
-  if (is.infinite(rtrange[2])) {
-    rtrange[2] <- max(x$rt) + 20
-  }
-  int_lim <- c(0, 1.1 * maxo)
   setnames(x, old = c("mz", "rt", "i", "file"),
            new = c("m/z", "Retention Time", "Intensity", "File"))
-  ## p_list <- list()
-  ## for (i in seq_along(fname)) {
-  ##   xs <- x[File == fname[i]]
-  ##   if (nrow(xs)) {
-  ##     p_list[fname[i]] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
-  ##                               int_lim = int_lim, fname[i])
-  ##   }
-  ## }
-  ## for (i in fname) {
-  ##   xs <- x[File == i]
-  ##   if (nrow(xs)) {
-  ##     suppressWarnings(
-  ##       p_list[i] <- p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
-  ##                          int_lim = int_lim, i)
-  ##     )
-  ##   }
-  ## }
   p_list <- lapply(fname, function(i) {
     xs <- x[File == i]
-    if (nrow(xs)) {
+    ## create dummy data when no data for a subset of selected files
+    if (nrow(xs) == 0) {
+      xs <- x[1, ]
+      xs$File <- i
       p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
-            int_lim = int_lim, i)
+            int_lim = int_lim, blank = TRUE)
+    ## no data for all files
+    } else if (any(xs$mz < 0)) {
+      p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
+            int_lim = int_lim, blank = TRUE)
     } else {
-      NULL
+      p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
+            int_lim = int_lim, blank = FALSE)
     }
   })
-  p_list <- p_list[!sapply(p_list, is.null)] ## remove NULL entries from the list
-  n_plots <- length(p_list)
-  if (n_plots) {
-    n_cols <- ceiling(sqrt(n_plots))
-    n_rows <- ceiling(n_plots / n_cols)
-    subplot(p_list, nrows = n_rows, shareX = TRUE, titleY = TRUE, margin = 0.05)
-  } else {
-    NULL
-  }
+  n_rows <- get_multp_nrow(p_list)
+  suppressWarnings(
+    layout(
+      ## specifying height in layout is now deprecated
+      ## need a better solution
+      subplot(p_list, nrows = n_rows, shareX = TRUE, titleY = TRUE, margin = 0.05),
+      height = 350 * n_rows
+    )
+  )
 }
 
 p_feature_area <- function(x, title) {

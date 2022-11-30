@@ -24,8 +24,7 @@ server <- function(input, output, session) {
   ## Extend input for intermediate states
   ##############################################################################
   v <- reactiveValues(fname = NULL, raw = NULL, fdata = NULL,
-                      xic = NULL, massspec = NULL,
-                      scan_choices = NULL, peak = NULL,
+                      massspec = NULL, scan_choices = NULL, peak = NULL,
                       ui_nopeak = FALSE, feature = NULL)
 
   ##############################################################################
@@ -162,7 +161,7 @@ server <- function(input, output, session) {
         output$tic <- renderPlotly({
           type <- if (input$bpc) "max" else "sum"
           facet <- if (input$collapse) FALSE else TRUE
-          ggplotly(p_chrom(xs, type = type, facet = facet))
+          ggplotly(p_tic(xs, type = type, facet = facet))
         })
       }
     })
@@ -180,22 +179,22 @@ server <- function(input, output, session) {
         selected = unique(as.character(v$fdata$file))
       )
       observeEvent(input$xic_files, {
-        v$xic <- p_xic_list(
+        rtrange <- rtr()
+        if (is.infinite(rtrange[1])) {
+          rtrange[1] <- 0
+        }
+        if (is.infinite(rtrange[2])) {
+          rtrange[2] <- max(v$fdata$rt) + 20
+        }
+        ## Assign figure and render separately so that figure only respond to
+        ## XIC button (don't know why?)
+        xic <- p_xic_list(
           v$fdata[file %in% input$xic_files],
           mzrange = mzr(),
-          rtrange = rtr(),
-          fname = v$fname
+          rtrange = rtrange,
+          fname = input$xic_files
         )
-        if (!is.null(v$xic)) {
-          output$xic <- renderPlotly({
-            v$xic
-          })
-        } else {
-          showNotification(
-            ui = "No data points are available!",
-            duration = 3, type = "error"
-          )
-        }
+        output$xic <- renderPlotly(xic)
       })
     })
   })
