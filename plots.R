@@ -1,5 +1,4 @@
-get_multp_nrow <- function(p_list) {
-  n_plots <- length(p_list)
+get_multp_nrow <- function(n_plots) {
   n_cols <- ceiling(sqrt(n_plots))
   ceiling(n_plots / n_cols)
 }
@@ -11,19 +10,21 @@ p_tic <- function(x, type = c("sum", "max"), facet = TRUE) {
   } else {
     d <- x[, .(Intensity = max(i)), by = .(file, rt)]
   }
+  n_plots <- length(unique(x$file))
+  n_rows <- get_multp_nrow(n_plots)
   setnames(d, old = c("rt", "file"), new = c("Retention Time", "File"))
   p <- ggplot(d, aes(x = `Retention Time`, y = Intensity)) +
     theme_bw()
   if (facet) {
     p <- p +
       geom_line() +
-      facet_wrap(~ File) +
+      facet_wrap(~ File, nrow = n_rows) +
       theme(legend.position = "none")
   } else {
     p <- p +
       geom_line(aes(col = File))
   }
-  p
+  ggplotly(p, height = 350 * n_rows)
 }
 
 p_massspec <- function(x, file, scan, yaxis) {
@@ -111,7 +112,7 @@ p_xic_list <- function(x, mzrange, rtrange, fname) {
             int_lim = int_lim, blank = FALSE)
     }
   })
-  n_rows <- get_multp_nrow(p_list)
+  n_rows <- get_multp_nrow(length(p_list))
   suppressWarnings(
     layout(
       ## specifying height in layout is now deprecated

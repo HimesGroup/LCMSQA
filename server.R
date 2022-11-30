@@ -161,7 +161,7 @@ server <- function(input, output, session) {
         output$tic <- renderPlotly({
           type <- if (input$bpc) "max" else "sum"
           facet <- if (input$collapse) FALSE else TRUE
-          ggplotly(p_tic(xs, type = type, facet = facet))
+          p_tic(xs, type = type, facet = facet)
         })
       }
     })
