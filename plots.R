@@ -117,7 +117,10 @@ p_xic_list <- function(x, mzrange, rtrange, fname) {
     layout(
       ## specifying height in layout is now deprecated
       ## need a better solution
-      subplot(p_list, nrows = n_rows, shareX = TRUE, titleY = TRUE, margin = 0.05),
+      subplot(
+        p_list, nrows = n_rows, shareX = TRUE,
+        titleY = TRUE, margin = 0.05
+      ),
       height = 350 * n_rows
     )
   )
@@ -162,18 +165,22 @@ p_peak <- function(x, mzrange, rtrange, rt_offset, int_lim) {
   )
   setnames(x, old = c("rt", "i", "file"),
            new = c("Retention Time", "Intensity", "File"))
-  ggplot(x) +
-  geom_rect(data = d_rect,
-            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
-            fill = alpha("gray90", 0.3),
-            col = alpha("red", 0.3)
-            ) +
+  p <- ggplot(x) +
+    geom_rect(data = d_rect,
+              aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+              fill = alpha("gray90", 0.3),
+              col = alpha("red", 0.3)
+              ) +
     geom_point(aes(x = `Retention Time`, y = Intensity, col = Intensity)) +
     facet_wrap(~ File) +
     scale_x_continuous(limits = xlim) +
     scale_y_continuous(limits = int_lim) +
     scale_color_viridis_c(limits = int_lim) +
     theme_bw()
+  layout(
+    ggplotly(p),
+    yaxis = list(title = list(text = "Intensity", font = list(size = 14)))
+  )
 }
 
 p_peak_list <- function(x, peak_info) {
