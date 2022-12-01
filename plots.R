@@ -95,12 +95,12 @@ p_xic_list <- function(x, mzrange, rtrange, fname) {
   }
   setnames(x, old = c("mz", "rt", "i", "file"),
            new = c("m/z", "Retention Time", "Intensity", "File"))
-  p_list <- lapply(fname, function(i) {
-    xs <- x[File == i]
+  p_list <- lapply(fname, function(k) {
+    xs <- x[File == k]
     ## create dummy data when no data for a subset of selected files
     if (nrow(xs) == 0) {
       xs <- x[1, ]
-      xs$File <- i
+      xs$File <- k
       p_xic(xs, mz_lim = mzrange, rt_lim = rtrange,
             int_lim = int_lim, blank = TRUE)
     ## no data for all files
@@ -178,20 +178,17 @@ p_peak <- function(x, mzrange, rtrange, rt_offset) {
 
 p_peak_list <- function(x, peak_info) {
   rtrange <- c(min(peak_info$rtmin), max(peak_info$rtmax))
-  p_list <- list()
-  for (i in seq_along(peak_info$fname)) {
-    idx <- which(x$file == peak_info$fname[i])
-    xs <- x[idx, ]
-    p_list[[i]] <- p_peak(
+  p_list <- lapply(as.character(peak_info$fname), function(k) {
+    xs <- x[file == k]
+    idx <- which(peak_info$fname == k)
+    mzrange <- c(peak_info$mzmin[idx], peak_info$mzmax[idx])
+    p_list <- p_peak(
       xs,
-      mzrange = c(peak_info$mzmin[i], peak_info$mzmax[i]),
+      mzrange = mzrange,
       rtrange = rtrange,
-      ## rt_offset = 3 * input$bw
       rt_offset = 20
     )
-  }
-  n_plots <- length(p_list)
-  n_cols <- ceiling(sqrt(n_plots))
-  n_rows <- ceiling(n_plots / n_cols)
+  })
+  n_rows <- get_multp_nrow(length(p_list))
   subplot(p_list, nrows = n_rows, margin = c(0.03, 0.03, 0.07, 0.07))
 }
