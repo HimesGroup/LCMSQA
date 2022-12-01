@@ -151,7 +151,7 @@ p_feature_area <- function(x, title) {
           axis.text.x = element_text(angle = 45))
 }
 
-p_peak <- function(x, mzrange, rtrange, rt_offset) {
+p_peak <- function(x, mzrange, rtrange, rt_offset, int_lim) {
   x <- x[mz >= mzrange[1] & mz <= mzrange[2]]
   xlim <- c(max(0, (rtrange[1] - rt_offset)),
             rtrange[2] + rt_offset)
@@ -170,25 +170,34 @@ p_peak <- function(x, mzrange, rtrange, rt_offset) {
             ) +
     geom_point(aes(x = `Retention Time`, y = Intensity, col = Intensity)) +
     facet_wrap(~ File) +
-    scale_color_viridis_c() +
     scale_x_continuous(limits = xlim) +
-    theme_bw() +
-    theme(legend.position = "none")
+    scale_y_continuous(limits = int_lim) +
+    scale_color_viridis_c(limits = int_lim) +
+    theme_bw()
 }
 
 p_peak_list <- function(x, peak_info) {
   rtrange <- c(min(peak_info$rtmin), max(peak_info$rtmax))
+  xg <- x[mz >= min(peak_info$mzmin) & mz <= max(peak_info$mzmax)]
+  int_lim <- c(0, 1.1 * max(xg[rt >= rtrange[1] & rt <= rtrange[2]]$i))
   p_list <- lapply(as.character(peak_info$fname), function(k) {
-    xs <- x[file == k]
+    xs <- xg[file == k]
     idx <- which(peak_info$fname == k)
     mzrange <- c(peak_info$mzmin[idx], peak_info$mzmax[idx])
     p_list <- p_peak(
       xs,
       mzrange = mzrange,
       rtrange = rtrange,
-      rt_offset = 20
+      rt_offset = 20,
+      int_lim = int_lim
     )
   })
   n_rows <- get_multp_nrow(length(p_list))
-  subplot(p_list, nrows = n_rows, margin = c(0.03, 0.03, 0.07, 0.07))
+  suppressWarnings(
+    layout(
+      subplot(p_list, nrows = n_rows, margin = c(0.03, 0.03, 0.07, 0.07),
+              shareX = TRUE, titleY = TRUE),
+      height = 300 * n_rows
+    )
+  )
 }
