@@ -57,7 +57,7 @@ get_df <- function(x) {
 }
 
 ################################################################################
-## Compound information to set m/z searching space
+## Set m/z searching space from compound information
 ################################################################################
 get_mzrange <- function(mz, ppm = 30) {
   delta <- ppm * mz / 1e6
@@ -66,12 +66,10 @@ get_mzrange <- function(mz, ppm = 30) {
 
 get_compound_mzrange <- function(compound, compound_dat, ppm) {
   compound_idx <- which(compound_dat$id == compound)
-  mz <- compound_dat$mz[compound_idx]
+  mz <- compound_dat$theoretical_mz[compound_idx]
   get_mzrange(mz, ppm)
 }
 
-compound_dat <- fread("compound_info.csv")
-compound_dat[, id := paste(compound, adduct, sep = " ")]
 
 ################################################################################
 ## Machine-specific feature detection parameters

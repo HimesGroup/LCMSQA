@@ -59,6 +59,11 @@ maintabs_ui <- function(fdata) {
       ),
       uiOutput("peak_tbl"),
       uiOutput("peak_fig")
+    ),
+    tabPanel(
+      "Standard Information",
+      br(),
+      DTOutput("standard_tbl")
     )
   )
 }

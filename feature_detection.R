@@ -1,4 +1,4 @@
-featuredetection_ui <- function() {
+featuredetection_ui <- function(compound_dat) {
   fluidRow(
     column(
       12,
@@ -34,9 +34,11 @@ featuredetection_ui <- function() {
               9,
               selectizeInput(
                 "compound", "",
-                choices = list(`Positive Mode` = compound_dat[mode == "positive"]$id,
-                               `Negative Mode` = compound_dat[mode == "negative"]$id),
-                selected = compound_dat[mode == "positive"]$id[1]
+                choices = list(
+                  `Positive Mode` = compound_dat[mode == "positive"]$id,
+                  `Negative Mode` = compound_dat[mode == "negative"]$id
+                ),
+                selected = compound_dat$id[1]
               )
             ),
             column(

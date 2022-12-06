@@ -23,9 +23,9 @@ server <- function(input, output, session) {
   ##############################################################################
   ## Extend input for intermediate states
   ##############################################################################
-  v <- reactiveValues(fname = NULL, raw = NULL, fdata = NULL,
-                      massspec = NULL, scan_choices = NULL, peak = NULL,
-                      ui_nopeak = FALSE, feature = NULL)
+  v <- reactiveValues(fname = NULL, raw = NULL, compound_dat = NULL,
+                      fdata = NULL, massspec = NULL, scan_choices = NULL,
+                      peak = NULL, ui_nopeak = FALSE, feature = NULL)
 
   ##############################################################################
   ## Conditional UI for m/z specification
@@ -53,7 +53,7 @@ server <- function(input, output, session) {
       c(as.numeric(input$xic_mz_min), as.numeric(input$xic_mz_max))
     } else {
       req(input$xic_mz_window)
-      get_compound_mzrange(comp(), compound_dat, as.numeric(input$xic_mz_window))
+      get_compound_mzrange(comp(), v$compound_dat, as.numeric(input$xic_mz_window))
     }
   })
 
@@ -140,14 +140,49 @@ server <- function(input, output, session) {
       v$fdata <- as.data.table(do.call(rbind, dl))
       v$fdata[, file := factor(file, levels = v$fname)]
     })
-    output$featuredetection <- renderUI(
+    output$standard <- renderUI(
       tagList(
-        featuredetection_ui()
+        bs_embed_popover(
+          fileInput("standard_info", "Provide standard information",
+                    multiple = FALSE, accept = list(".csv")),
+          paste0(
+            "Input must be a csv file with the following columns: ",
+            "compound, adduct, mode (positive or negative), and theoretical_mz ",
+            "(e.g., Lactate, [M+H]+, positive, 94.04903)"
+          )
+        ),
+        div(style = "margin-top: -20px"),
+        checkboxInput("standard_skip", "Skip and use the default list")
       )
     )
-    output$tabs <- renderUI(
-      maintabs_ui(v$fdata)
-    )
+    observeEvent({
+      input$standard_info
+      input$standard_skip
+    }, {
+      if (isTruthy(input$standard_info) || input$standard_skip) {
+        if (!is.null(input$standard_info)) {
+          v$compound_dat <- fread(input$standard_info$datapath, sep = ",")
+        } else {
+          v$compound_dat <- fread("compound_info.csv")
+        }
+        v$compound_dat[, id := paste(compound, adduct, sep = " ")]
+        shinyjs::hide("upload")
+        shinyjs::hide("standard_info")
+        shinyjs::hide("standard_skip")
+        output$featuredetection <- renderUI(
+          tagList(
+            featuredetection_ui(v$compound_dat)
+          )
+        )
+        output$tabs <- renderUI(
+          maintabs_ui(v$fdata)
+        )
+        d <- v$compound_dat[, -c("id")]
+        setnames(d, old = "theoretical_mz", new = "theoretical m/z")
+        setcolorder(d, c("compound", "adduct", "mode", "theoretical m/z"))
+        output$standard_tbl <- renderDT(datatable(d, selection = "none"))
+      }
+    })
   })
 
   ##############################################################################

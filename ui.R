@@ -14,11 +14,19 @@ ui <- fluidPage(
   ## File upload
   sidebarLayout(
     sidebarPanel(
-      fileInput(
-        inputId = "upload",
-        label = "Choose LC/MS files",
-        multiple = TRUE
+      bs_embed_popover(
+        fileInput(
+          inputId = "upload",
+          label = "Choose LC/MS files",
+          multiple = TRUE
+        ),
+        paste0(
+          "Input must be valid mass-spectrometry data files ",
+          "in open format (mzML, mzData, mzXML, and netCDF)"
+        )
       ),
+      br(),
+      uiOutput("standard"),
       uiOutput("featuredetection"),
       width = 4
     ),
