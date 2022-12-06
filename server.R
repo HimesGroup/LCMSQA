@@ -147,7 +147,7 @@ server <- function(input, output, session) {
                     multiple = FALSE, accept = list(".csv")),
           paste0(
             "Input must be a csv file with the following columns: ",
-            "compound, adduct, mode (positive or negative), and theoretical_mz ",
+            "compound, adduct, mode (positive or negative), and mz ",
             "(e.g., Lactate, [M+H]+, positive, 94.04903)"
           )
         ),
@@ -163,7 +163,7 @@ server <- function(input, output, session) {
         if (!is.null(input$standard_info)) {
           v$compound_dat <- fread(input$standard_info$datapath, sep = ",")
         } else {
-          v$compound_dat <- fread("compound_info.csv")
+          v$compound_dat <- fread("standard_info.csv")
         }
         v$compound_dat[, id := paste(compound, adduct, sep = " ")]
         shinyjs::hide("upload")
@@ -178,9 +178,18 @@ server <- function(input, output, session) {
           maintabs_ui(v$fdata)
         )
         d <- v$compound_dat[, -c("id")]
-        setnames(d, old = "theoretical_mz", new = "theoretical m/z")
-        setcolorder(d, c("compound", "adduct", "mode", "theoretical m/z"))
-        output$standard_tbl <- renderDT(datatable(d, selection = "none"))
+        setnames(d, old = "mz", new = "m/z")
+        setcolorder(d, c("compound", "adduct", "mode", "m/z"))
+        output$standard_tbl <- renderDT(
+          datatable(
+            d,
+            selection = "none",
+            extensions = "Buttons",
+            options = list(
+              dom = "Bfrtip", buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+            )
+          )
+        )
       }
     })
   })

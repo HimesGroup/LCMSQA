@@ -66,7 +66,7 @@ get_mzrange <- function(mz, ppm = 30) {
 
 get_compound_mzrange <- function(compound, compound_dat, ppm) {
   compound_idx <- which(compound_dat$id == compound)
-  mz <- compound_dat$theoretical_mz[compound_idx]
+  mz <- compound_dat$mz[compound_idx]
   get_mzrange(mz, ppm)
 }
 
