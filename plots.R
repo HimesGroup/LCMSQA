@@ -126,29 +126,36 @@ p_xic_list <- function(x, mzrange, rtrange, fname) {
   )
 }
 
-p_feature_area <- function(x, title) {
-  x[, Area := log2(Area)]
-  x[, label := sprintf("%.2f", Area)]
+p_feature_area <- function(x, title, log2, show_val) {
+  x[, AUC := Area]
+  if (log2) {
+    x[, AUC := log2(AUC)]
+    ytitle <- "Log2 Area"
+  } else {
+    ytitle <- "Area"
+  }
+  x[, label := sprintf("%.2f", AUC)]
   title <- NULL
   if (nrow(x) > 1) {
-    area_sd <- sd(x$Area)
+    area_sd <- sd(x$AUC)
     if (is.na(area_sd)) {
-      area_sd <- "N/A"
       area_rsd <- "N/A"
     } else{
-      area_rsd <- 100 * area_sd / mean(x$Area)
-      area_sd <- sprintf("%.2f", area_sd)
+      area_rsd <- 100 * area_sd / mean(x$AUC)
       area_rsd <- sprintf("%.2f", area_rsd)
-      title <- paste0("SD: ", area_sd, ", ",
-                      "RSD: ", area_rsd, "%")
+      title <- paste0("RSD: ", area_rsd, "%")
     }
   }
-  ggplot(x, aes(x = File, y = Area, fill = File)) +
-    geom_col(width = 0.5) +
-    geom_text(aes(label = label), position = position_stack(vjust = 0.5)) +
+  p <- ggplot(x, aes(x = File, y = AUC, fill = File)) +
+    geom_col(width = 0.5)
+  if (show_val) {
+    p <- p +
+      geom_text(aes(label = label), position = position_stack(vjust = 0.5))
+  }
+  p +
     theme_bw() +
     labs(title = title) +
-    ylab("Log2 Peak Area") +
+    ylab(ytitle) +
     theme(legend.position = "none",
           axis.title.x = element_blank(),
           axis.text.x = element_text(angle = 45))

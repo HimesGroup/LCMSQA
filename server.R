@@ -186,7 +186,7 @@ server <- function(input, output, session) {
             selection = "none",
             extensions = "Buttons",
             options = list(
-              dom = "Bfrtip", buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+              dom = "Bfrtip", buttons = c('copy', 'csv', 'excel')
             )
           )
         )
@@ -359,7 +359,7 @@ server <- function(input, output, session) {
             selection = list(mode = "single", selected = 1, target = "row"),
             extensions = "Buttons",
             options = list(
-              dom = "Bfrtip", buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+              dom = "Bfrtip", buttons = c('copy', 'csv', 'excel')
             )
           )
         )
@@ -383,7 +383,7 @@ server <- function(input, output, session) {
                variable.name = "File", value.name = "Area")
     dl[, File := factor(File, levels = v$fname)]
     output$feature_bar <- renderPlotly({
-      ggplotly(p_feature_area(dl, title))
+      ggplotly(p_feature_area(dl, title, input$log2, input$show_val))
     })
 
     ## Feature-peak table
@@ -402,18 +402,18 @@ server <- function(input, output, session) {
              .SDcols = mz_cols]
     peak_tbl[, (rt_cols) := lapply(.SD, function(x) sprintf("%.3f", x)),
              .SDcols = rt_cols]
-    peak_tbl[, area := sprintf("%.2f", log2(into))]
+    peak_tbl[, area := sprintf("%.2f", into)]
     keep_cols <- c("fname", mz_cols, rt_cols, "area")
     peak_tbl <- peak_tbl[, ..keep_cols]
     setnames(peak_tbl, new = c("file", "m/z", "m/z min", "m/z max",
-                               "time", "time min", "time max", "log2 area"))
+                               "time", "time min", "time max", "area"))
     output$feature_peak_map <- renderDT(
       datatable(
         peak_tbl,
         selection = "none",
         extensions = "Buttons",
         options = list(
-          dom = "Bfrtip", buttons = c('copy', 'csv', 'excel', 'pdf', 'print')
+          dom = "Bfrtip", buttons = c('copy', 'csv', 'excel')
         )
       )
     )
