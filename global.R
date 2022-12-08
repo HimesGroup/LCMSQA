@@ -11,6 +11,7 @@ library(ggplot2)
 library(plotly) ## interactive graphic
 library(viridisLite) ## Viridis palette
 library(tools)
+library(BiocParallel)
 options(shiny.maxRequestSize = 1000 * (1024**2)) ## size limit for file upload
 source("plots.R")
 source("feature_detection.R")
