@@ -24,6 +24,16 @@ has_spectra <- function(x) {
   all(MSnbase::hasSpectra(x))
 }
 
+
+################################################################################
+## Validate standard info file
+################################################################################
+has_all_columns <- function(x) {
+  df_name <- names(x)
+  diff_cols <- setdiff(c("compound", "adduct", "mode", "mz"), df_name)
+  if (length(diff_cols) == 0) TRUE else FALSE
+}
+
 ################################################################################
 ## Mandatory fields to activate XIC plot and feature detection buttons
 ################################################################################

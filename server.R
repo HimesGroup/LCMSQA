@@ -165,31 +165,40 @@ server <- function(input, output, session) {
         } else {
           v$compound_dat <- fread("standard_info.csv")
         }
-        v$compound_dat[, id := paste(compound, adduct, sep = " ")]
-        shinyjs::hide("upload")
-        shinyjs::hide("standard_info")
-        shinyjs::hide("standard_skip")
-        output$featuredetection <- renderUI(
-          tagList(
-            featuredetection_ui(v$compound_dat)
-          )
-        )
-        output$tabs <- renderUI(
-          maintabs_ui(v$fdata)
-        )
-        d <- v$compound_dat[, -c("id")]
-        setnames(d, old = "mz", new = "m/z")
-        setcolorder(d, c("compound", "adduct", "mode", "m/z"))
-        output$standard_tbl <- renderDT(
-          datatable(
-            d,
-            selection = "none",
-            extensions = "Buttons",
-            options = list(
-              dom = "Bfrtip", buttons = c('copy', 'csv', 'excel')
+        if (has_all_columns(v$compound_dat)) {
+          v$compound_dat[, id := paste(compound, adduct, sep = " ")]
+          shinyjs::hide("upload")
+          shinyjs::hide("standard_info")
+          shinyjs::hide("standard_skip")
+          output$featuredetection <- renderUI(
+            tagList(
+              featuredetection_ui(v$compound_dat)
             )
           )
-        )
+          output$tabs <- renderUI(
+            maintabs_ui(v$fdata)
+          )
+          d <- v$compound_dat[, -c("id")]
+          setnames(d, old = "mz", new = "m/z")
+          setcolorder(d, c("compound", "adduct", "mode", "m/z"))
+          output$standard_tbl <- renderDT(
+            datatable(
+              d,
+              selection = "none",
+              extensions = "Buttons",
+              options = list(
+                dom = "Bfrtip", buttons = c('copy', 'csv', 'excel')
+              )
+            )
+          )
+        } else {
+          showNotification(
+            paste0("Input must have the following columns: ",
+                   "compound, adduct, mode, and mz. ",
+                   "Please re-upload a valid file."),
+            duration = 5, type = "error", closeButton = FALSE
+          )
+        }
       }
     })
   })
