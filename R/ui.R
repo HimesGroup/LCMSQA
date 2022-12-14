@@ -1,8 +1,8 @@
 ui <- fluidPage(
   ## Enable js
-  shinyjs::useShinyjs(),
+  useShinyjs(),
   ## Enable tooltip
-  bsplus::use_bs_tooltip(),
+  use_bs_tooltip(),
   ## Set theme
   theme = bs_theme(
     bootswatch = "minty",

@@ -1,21 +1,17 @@
-library(shiny)
-library(shinyWidgets) ## picker input (select-all option)
-library(shinyjs) ## enable JS operations
-library(shinycssloaders) ## loading animation
-library(bsplus) ## add tooltip
-library(bslib) ## bootstrap theme
-library(DT) ## interface to JS library DataTables
-library(data.table)
-library(xcms)
-library(ggplot2)
-library(plotly) ## interactive graphic
-library(viridisLite) ## Viridis palette
-library(tools)
-library(BiocParallel)
-options(shiny.maxRequestSize = 1000 * (1024**2)) ## size limit for file upload
-source("plots.R")
-source("feature_detection.R")
-source("maintabs.R")
+## library(shiny)
+## library(shinyWidgets) ## picker input (select-all option)
+## library(shinyjs) ## enable JS operations
+## library(shinycssloaders) ## loading animation
+## library(bsplus) ## add tooltip
+## library(bslib) ## bootstrap theme
+## library(DT) ## interface to JS library DataTables
+## library(data.table)
+## library(xcms)
+## library(ggplot2)
+## library(plotly) ## interactive graphic
+## library(viridisLite) ## Viridis palette
+## library(tools)
+## library(BiocParallel)
 
 ################################################################################
 ## Validate mass-spectrometry files
@@ -63,7 +59,7 @@ get_df <- function(x) {
   ## `x` is supposed to be a single file MSnExp object
   is(x, "MSnExp")
   d <- as.data.frame(x)
-  d$file <- pData(x)$fname
+  d$file <- MSnbase::pData(x)$fname
   d
 }
 

@@ -79,8 +79,8 @@ server <- function(input, output, session) {
       mandatory_filled <- FALSE
     }
     ## enable/disable the submit button
-    shinyjs::toggleState(id = "plot_xic", condition = mandatory_filled)
-    shinyjs::toggleState(id = "detect_feature", condition = mandatory_filled)
+    toggleState(id = "plot_xic", condition = mandatory_filled)
+    toggleState(id = "detect_feature", condition = mandatory_filled)
   })
 
   ##############################################################################
@@ -120,9 +120,9 @@ server <- function(input, output, session) {
   ## Read LC/MS data onto R via XCMS
   ##############################################################################
   observeEvent(flist(), {
-    v$fname <- file_path_sans_ext(flist()$name)
+    v$fname <- tools::file_path_sans_ext(flist()$name)
     withProgress(message = "Reading Data...", value = 0, {
-      v$raw <- readMSData(
+      v$raw <- MSnbase::readMSData(
         flist()$datapath,
         pdata = new(
           "NAnnotatedDataFrame",
@@ -137,7 +137,7 @@ server <- function(input, output, session) {
         dl[[i]] <- get_df(filterFile(v$raw, i))
         incProgress(1/n, detail = paste0("File ", i))
       }
-      v$fdata <- as.data.table(do.call(rbind, dl))
+      v$fdata <- rbindlist(dl)
       v$fdata[, file := factor(file, levels = v$fname)]
     })
     output$standard <- renderUI(
@@ -167,9 +167,9 @@ server <- function(input, output, session) {
         }
         if (has_all_columns(v$compound_dat)) {
           v$compound_dat[, id := paste(compound, adduct, sep = " ")]
-          shinyjs::hide("upload")
-          shinyjs::hide("standard_info")
-          shinyjs::hide("standard_skip")
+          hide("upload")
+          hide("standard_info")
+          hide("standard_skip")
           output$featuredetection <- renderUI(
             tagList(
               featuredetection_ui(v$compound_dat)
@@ -224,7 +224,7 @@ server <- function(input, output, session) {
   ## XIC plot
   ##############################################################################
   observeEvent(v$fdata, {
-    output$xic <- renderPlotly(NULL)
+    ## output$xic <- renderPlotly(NULL)
     observeEvent(input$plot_xic, {
       updateTabsetPanel(session, "tabs", selected = "Extracted Ion Chromatogram")
       updatePickerInput(
@@ -349,7 +349,7 @@ server <- function(input, output, session) {
       } else {
         fdef <- as.data.table(featureDefinitions(res), keep.rownames = "feature")
         fval <- as.data.table(featureValues(res), keep.rownames = "feature")
-        colnames(fval)[-1] <- as.character(pData(raw_sub)$fname)
+        colnames(fval)[-1] <- as.character(MSnbase::pData(raw_sub)$fname)
         mz_cols <- c("mzmed", "mzmin", "mzmax")
         rt_cols <- c("rtmed", "rtmin", "rtmax")
         v$feature <- merge(fdef, fval, sort = FALSE)
@@ -402,8 +402,8 @@ server <- function(input, output, session) {
       DTOutput("feature_peak_map")
     ))
     peaklist <- as.data.table(v$peak)[v$feature$peakidx[[idx]], ]
-    peak_sub <- merge(peaklist, pData(v$raw), by.x = "sample", by.y = "idx",
-                      sort = FALSE)
+    peak_sub <- merge(peaklist, MSnbase::pData(v$raw), by.x = "sample",
+                      by.y = "idx", sort = FALSE)
     peak_tbl <- copy(peak_sub)
     mz_cols <- c("mz", "mzmin", "mzmax")
     rt_cols <- c("rt", "rtmin", "rtmax")
