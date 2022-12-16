@@ -10,7 +10,6 @@
 ##' @importFrom shinycssloaders withSpinner
 ##' @importFrom DT DTOutput renderDT datatable
 ##' @importFrom shinyjs useShinyjs toggleState hide
-##' @importFrom BiocParallel register bpstart bpparam bpstop
 ##' @importFrom data.table fread data.table as.data.table rbindlist setnames
 ##'   setcolorder melt copy :=
 ##' @importFrom bslib bs_theme font_google
@@ -24,5 +23,3 @@
 ##'   findChromPeaks chromPeaks PeakDensityParam groupChromPeaks
 ##'   featureDefinitions featureValues
 "_PACKAGE"
-
-options(shiny.maxRequestSize = 1000 * (1024**2)) ## size limit for file upload

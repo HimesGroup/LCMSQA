@@ -1,5 +1,6 @@
 server <- function(input, output, session) {
-
+  ## Set file size limit
+  options(shiny.maxRequestSize = 1000 * (1024**2))
   ##############################################################################
   ## Validate files have spectra
   ##############################################################################
@@ -163,7 +164,7 @@ server <- function(input, output, session) {
         if (!is.null(input$standard_info)) {
           v$compound_dat <- fread(input$standard_info$datapath, sep = ",")
         } else {
-          v$compound_dat <- fread("standard_info.csv")
+          v$compound_dat <- copy(IS_Info)
         }
         if (has_all_columns(v$compound_dat)) {
           v$compound_dat[, id := paste(compound, adduct, sep = " ")]
@@ -224,7 +225,7 @@ server <- function(input, output, session) {
   ## XIC plot
   ##############################################################################
   observeEvent(v$fdata, {
-    ## output$xic <- renderPlotly(NULL)
+    output$xic <- renderPlotly(NULL) ## hide spinner when no request for XIC
     observeEvent(input$plot_xic, {
       updateTabsetPanel(session, "tabs", selected = "Extracted Ion Chromatogram")
       updatePickerInput(

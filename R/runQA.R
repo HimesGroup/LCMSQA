@@ -8,5 +8,8 @@
 ##'
 ##' @export
 runQA <- function() {
+  ## if (!("xcms" %in% (.packages()))) {
+  ##   suppressPackageStartupMessages(require(xcms))
+  ## }
   shinyApp(ui = ui, server = server)
 }
