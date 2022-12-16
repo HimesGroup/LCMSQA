@@ -17,7 +17,7 @@
 ##' @importFrom ggplot2 ggplot aes theme theme_bw geom_line facet_wrap
 ##'   geom_linerange ylab geom_point scale_x_continuous scale_y_continuous
 ##'   scale_color_viridis_c geom_blank geom_col element_blank element_text
-##'   geom_rect labs alpha
+##'   geom_rect labs alpha geom_text position_stack
 ##' @importFrom plotly plotlyOutput ggplotly subplot layout renderPlotly
 ##' @importFrom xcms filterFile filterMz filterRt CentWaveParam
 ##'   findChromPeaks chromPeaks PeakDensityParam groupChromPeaks

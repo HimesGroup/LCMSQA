@@ -386,14 +386,33 @@ server <- function(input, output, session) {
 
     ## Bar plot for feature intensities
     output$feature_fig <- renderUI(tagList(
+      pickerInput(
+        "feature_files", "Files",
+        choices = unique(as.character(v$fdata$file)),
+        selected = unique(as.character(v$fdata$file)),
+        multiple = TRUE, options = list(`actions-box` = TRUE)
+      ),
+      splitLayout(
+        checkboxInput("log2", "Log2 Scale"),
+        checkboxInput("show_val", "Show Values")
+      ),
       withSpinner(plotlyOutput("feature_bar"))
     ))
-    dw <- v$feature[idx, -c(1:11)]
-    dl <- melt(dw, measure.vars = colnames(dw),
-               variable.name = "File", value.name = "Area")
-    dl[, File := factor(File, levels = v$fname)]
-    output$feature_bar <- renderPlotly({
-      ggplotly(p_feature_area(dl, title, input$log2, input$show_val))
+    observeEvent(input$feature_files, {
+      dw <- v$feature[idx, -c(1:11)]
+      dl <- melt(dw, measure.vars = colnames(dw),
+                 variable.name = "File", value.name = "Area")
+      dl[, File := factor(File, levels = v$fname)]
+      output$feature_bar <- renderPlotly({
+        ggplotly(
+          p_feature_area(
+            dl[File %in% input$feature_files],
+            title,
+            input$log2,
+            input$show_val
+          )
+        )
+      })
     })
 
     ## Feature-peak table

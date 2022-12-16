@@ -54,13 +54,7 @@ maintabs_ui <- function(fdata) {
       br(),
       splitLayout(
         DTOutput("feature_tbl"),
-        fluidRow(
-          splitLayout(
-            checkboxInput("log2", "Log2 Scale"),
-            checkboxInput("show_val", "Show Values")
-          ),
-          uiOutput("feature_fig")
-        ),
+        uiOutput("feature_fig"),
         cellArgs = list(style = "padding: 10px")
       ),
       uiOutput("peak_tbl"),
