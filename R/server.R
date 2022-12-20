@@ -279,7 +279,7 @@ server <- function(input, output, session) {
       output$massspec <- renderPlotly({
         if (!is.null(v$massspec)) {
           tryCatch(
-            ggplotly(v$massspec),
+            ggplotly(v$massspec, tooltip = c("x", "ymax")),
             error = function(e) NULL
           )
         }
@@ -401,16 +401,14 @@ server <- function(input, output, session) {
     observeEvent(input$feature_files, {
       dw <- v$feature[idx, -c(1:11)]
       dl <- melt(dw, measure.vars = colnames(dw),
-                 variable.name = "File", value.name = "Area")
+                 variable.name = "File", value.name = "maxo")
       dl[, File := factor(File, levels = v$fname)]
       output$feature_bar <- renderPlotly({
-        ggplotly(
-          p_feature_area(
-            dl[File %in% input$feature_files],
-            title,
-            input$log2,
-            input$show_val
-          )
+        p_feature_area(
+          dl[File %in% input$feature_files],
+          title,
+          input$log2,
+          input$show_val
         )
       })
     })

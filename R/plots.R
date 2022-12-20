@@ -69,7 +69,7 @@ p_xic <- function(x, mz_lim, rt_lim, int_lim, blank = FALSE) {
     theme_bw()
   subplot(
     layout(
-      ggplotly(p_top),
+      ggplotly(p_top, tooltip = c("x", "y")),
       yaxis = list(title = list(text = "Intensity", font = list(size = 14)))
     ),
     layout(
@@ -127,38 +127,39 @@ p_xic_list <- function(x, mzrange, rtrange, fname) {
 }
 
 p_feature_area <- function(x, title, log2, show_val) {
-  x[, AUC := Area]
+  x[, Area := maxo]
   if (log2) {
-    x[, AUC := log2(AUC)]
+    x[, Area := log2(Area)]
     ytitle <- "Log2 Area"
   } else {
     ytitle <- "Area"
   }
-  x[, label := sprintf("%.2f", AUC)]
+  x[, label := sprintf("%.2f", Area)]
   title <- NULL
   if (nrow(x) > 1) {
-    area_sd <- sd(x$AUC)
+    area_sd <- sd(x$Area)
     if (is.na(area_sd)) {
       area_rsd <- "N/A"
     } else{
-      area_rsd <- 100 * area_sd / mean(x$AUC)
+      area_rsd <- 100 * area_sd / mean(x$Area)
       area_rsd <- sprintf("%.2f", area_rsd)
       title <- paste0("RSD: ", area_rsd, "%")
     }
   }
-  p <- ggplot(x, aes(x = File, y = AUC, fill = File)) +
+  p <- ggplot(x, aes(x = File, y = Area, fill = File)) +
     geom_col(width = 0.5)
   if (show_val) {
     p <- p +
       geom_text(aes(label = label), position = position_stack(vjust = 0.5))
   }
-  p +
+  p <- p +
     theme_bw() +
     labs(title = title) +
     ylab(ytitle) +
     theme(legend.position = "none",
           axis.title.x = element_blank(),
           axis.text.x = element_text(angle = 45))
+  ggplotly(p, tooltip = c("x", "y"))
 }
 
 p_peak <- function(x, mzrange, rtrange, rt_offset, int_lim) {
@@ -185,7 +186,7 @@ p_peak <- function(x, mzrange, rtrange, rt_offset, int_lim) {
     scale_color_viridis_c(limits = int_lim) +
     theme_bw()
   layout(
-    ggplotly(p),
+    ggplotly(p, tooltip = c("x", "y")),
     yaxis = list(title = list(text = "Intensity", font = list(size = 14)))
   )
 }
