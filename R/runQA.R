@@ -11,5 +11,7 @@ runQA <- function() {
   ## if (!("xcms" %in% (.packages()))) {
   ##   suppressPackageStartupMessages(require(xcms))
   ## }
+  ## Enable js
+  useShinyjs() ## need to initiate
   shinyApp(ui = ui, server = server)
 }
