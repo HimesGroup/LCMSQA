@@ -13,5 +13,5 @@ runQA <- function() {
   ## }
   ## Enable js
   useShinyjs() ## need to initiate
-  shinyApp(ui = ui, server = server)
+  shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
 }
