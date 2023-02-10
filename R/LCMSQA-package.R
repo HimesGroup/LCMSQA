@@ -19,6 +19,7 @@
 ##'   scale_color_viridis_c geom_blank geom_col element_blank element_text
 ##'   geom_rect labs alpha geom_text position_stack
 ##' @importFrom plotly plotlyOutput ggplotly subplot layout renderPlotly
+##'   event_register event_data
 ##' @importFrom xcms CentWaveParam PeakDensityParam
 ##' @importMethodsFrom xcms findChromPeaks chromPeaks groupChromPeaks
 ##'   featureDefinitions featureValues filterFile filterRt filterMz

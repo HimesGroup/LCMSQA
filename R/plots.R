@@ -27,23 +27,43 @@ p_tic <- function(x, type = c("sum", "max"), facet = TRUE) {
   ggplotly(p, height = 350 * n_rows)
 }
 
-p_massspec <- function(x, file, scan, yaxis) {
-  d <- x[file == file & rt == scan]
-  setnames(d, old = c("mz", "i"), new = c("m/z", "Intensity"))
+p_bpc_mass <- function(x, rtrange = NULL, type = c("max", "sum"),
+                       source = "mass_bpc") {
+  type <- match.arg(type)
+  if (!is.null(rtrange)) {
+    x <- x[rt >= rtrange[1] & rt <= rtrange[2]]
+  }
+  if (type == "sum") {
+    x <- x[, .(Intensity = sum(i)), by = .(file, rt)]
+  } else {
+    x <- x[, .(Intensity = max(i)), by = .(file, rt)]
+  }
+  setnames(x, old = c("rt", "file"), new = c("Retention Time", "File"))
+  p <- ggplot(x, aes(x = `Retention Time`, y = Intensity)) +
+    geom_line() +
+    theme_bw()
+  p <- ggplotly(p, source = source)
+  event_register(p, "plotly_click")
+}
+
+p_massspec <- function(x, scan, yaxis) {
+  x <- x[sprintf("%.5f", rt) == sprintf("%.5f", as.numeric(scan))]
+  setnames(x, old = c("mz", "i"), new = c("m/z", "Intensity"))
   if (yaxis == "Relative Abundance") {
     ## s <- sum(d$i)
-    s <- max(d$Intensity)
-    d[, Intensity := 100 * (Intensity / s)]
+    s <- max(x$Intensity)
+    x[, Intensity := 100 * (Intensity / s)]
     ytitle <- c("Relative Abundance (%)")
-
   } else {
     ytitle <- c("Intensity")
   }
-  ggplot(d, aes(x = `m/z`, ymin = 0, ymax = Intensity)) +
+  p <- ggplot(x, aes(x = `m/z`, ymin = 0, ymax = Intensity)) +
     geom_linerange() +
     theme_bw() +
+    labs(title = paste0("Scan Time: ", sprintf("%.5f", as.numeric(scan)))) +
     ylab(ytitle) +
     theme(legend.position = "none")
+  ggplotly(p, tooltip = c("x", "ymax"))
 }
 
 p_xic <- function(x, mz_lim, rt_lim, int_lim, blank = FALSE) {

@@ -21,19 +21,24 @@ maintabs_ui <- function(fdata) {
     tabPanel(
       "Mass Spectrum",
       br(),
+      h4("Please click a data point in the chromatogram"),
+      br(),
       fluidRow(
         selectizeInput(
           "massspec_file", "File", choices = unique(as.character(fdata$file)),
           selected = unique(as.character(fdata$file))[1]
         ),
-        numericInput("ms_int_cut", "Intensity Threshold", value = 10000)
+        selectizeInput(
+          "yaxis", "Spectrum Y-axis",
+          choices = c("Relative Abundance", "Absolute Intensity"),
+          selected = "Relative Abundance"
+        )
       ),
-      fluidRow(
-        selectizeInput("scan", "Scan Time", choices = NULL),
-        selectizeInput("yaxis", "Y-axis",
-                       choices = c("Relative Abundance", "Absolute Intensity"),
-                       selected = "Relative Abundance")
-      ),
+      h5("Base peak chromatogram", style = "color:skyblue"),
+      uiOutput("massbpc_slider"),
+      withSpinner(plotlyOutput("massbpc")),
+      h5("Mass spectrum", style = "color:lightcoral"),
+      br(),
       withSpinner(plotlyOutput("massspec"))
     ),
     tabPanel(
@@ -67,4 +72,3 @@ maintabs_ui <- function(fdata) {
     )
   )
 }
-
