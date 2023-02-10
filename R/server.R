@@ -6,7 +6,7 @@ server <- function(input, output, session) {
   ## Extend input for intermediate states
   ##############################################################################
   v <- reactiveValues(fname = NULL, raw = NULL, compound_dat = NULL,
-                      fdata = NULL, massspec = NULL, scan_choices = NULL,
+                      fdata = NULL, p_mass_bpc = NULL, mass_dat = NULL,
                       peak = NULL, ui_nopeak = FALSE, feature = NULL,
                       datapath = NULL)
 
@@ -299,35 +299,43 @@ server <- function(input, output, session) {
   ##############################################################################
   ## Mass spectrum plot
   ##############################################################################
-  observeEvent({
-    input$massspec_file
-    input$ms_int_cut
-  }, {
-    v$scan_choices <- unique(
-      v$fdata[file == input$massspec_file & i >= input$ms_int_cut]$rt
-    )
-    updateSelectizeInput(session, "scan", choices = v$scan_choices,
-                         selected = v$scan_choices[1], server = TRUE)
-  })
-
-  observeEvent({
-    input$scan
-    input$yaxis
-  }, {
-    if (!is.null(input$scan) && input$scan != "") {
-      v$massspec <- p_massspec(
-        v$fdata, file = input$massspec_file,
-        scan = input$scan, yaxis = input$yaxis
+  observeEvent(input$massspec_file, {
+    output$massspec <- renderPlotly(NULL) ## hide spinner
+    rt_max <- ceiling(max(v$fdata[file == input$massspec_file]$rt) / 10) * 10
+    output$massbpc_slider <- renderUI(tagList(
+      br(),
+      sliderInput(
+        "massbpc_rt", "Retention Time Range",
+        min = 0, max = rt_max, value = c(0, rt_max), step = 30
       )
-      output$massspec <- renderPlotly({
-        if (!is.null(v$massspec)) {
-          tryCatch(
-            ggplotly(v$massspec, tooltip = c("x", "ymax")),
-            error = function(e) NULL
-          )
-        }
+    ))
+    v$mass_dat <- v$fdata[file == input$massspec_file]
+    if (!is.null(v$mass_dat)) {
+      output$massbpc <- renderPlotly({
+        v$p_mass_bpc <- tryCatch(
+          p_bpc_mass(v$mass_dat, rtrange = input$massbpc_rt),
+          warning = function(w) NULL,
+          error = function(e) NULL
+        )
       })
     }
+    observeEvent({
+      req(v$p_mass_bpc)
+      event_data("plotly_click", source = "mass_bpc")
+      v$mass_dat
+    }, {
+      d <- event_data("plotly_click", source = "mass_bpc")
+      output$massspec <- renderPlotly({
+        tryCatch(
+          p_massspec(
+            v$mass_dat,
+            scan = d$x, yaxis = input$yaxis
+          ),
+          warning = function(w) NULL,
+          error = function(e) NULL
+        )
+      })
+    })
   })
 
   ##############################################################################
