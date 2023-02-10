@@ -38,7 +38,7 @@ mandatory_fields_preset <- c(
 )
 
 mandatory_fields_manual <- c(
-  "xic_mz_min", "xic_mz_max", "xic_rt_min", "xic_rt_max"
+  "xic_mz_val", "xic_mz_err", "xic_rt_min", "xic_rt_max"
 )
 
 test_mandatory <- function(input, mandatory_fields) {

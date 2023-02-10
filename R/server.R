@@ -52,7 +52,9 @@ server <- function(input, output, session) {
 
   mzr <- reactive({
     if (mz_manual()) {
-      c(as.numeric(input$xic_mz_min), as.numeric(input$xic_mz_max))
+      req(input$xic_mz_val)
+      req(input$xic_mz_err)
+      get_mzrange(as.numeric(input$xic_mz_val), as.numeric(input$xic_mz_err))
     } else {
       req(input$xic_mz_window)
       get_compound_mzrange(comp(), v$compound_dat, as.numeric(input$xic_mz_window))

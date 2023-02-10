@@ -17,10 +17,16 @@ featuredetection_ui <- function(compound_dat) {
       conditionalPanel(
         condition = "input.manual == 1",
         wellPanel(
-          "m/z",
-          splitLayout(
-            textInput("xic_mz_min", "", value = NULL, placeholder = "min"),
-            textInput("xic_mz_max", "", value = NULL, placeholder = "max")
+          "m/z  (± ppm)",
+          fluidRow(
+            column(
+              9,
+              textInput("xic_mz_val", "", value = NULL, placeholder = "m/z")
+            ),
+            column(
+              3,
+              textInput("xic_mz_err", "", value = 10, placeholder = "ppm")
+            )
           )
         ),
         br()
@@ -46,7 +52,7 @@ featuredetection_ui <- function(compound_dat) {
               textInput("xic_mz_window", "", value = 10, placeholder = "ppm")
             )
           ),
-          style = "padding-bottom: 9.45px"
+          style = "padding-bottom: 8px"
         ),
         br()
       ),
