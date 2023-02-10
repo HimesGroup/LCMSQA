@@ -6,6 +6,29 @@ server <- function(input, output, session) {
   ##############################################################################
   flist <- reactive({
     req(input$upload)
+    fext <- tolower(tools::file_ext(input$upload$datapath))
+    if (any(fext == "raw")) {
+      showNotification(
+        "Thermo Raw files are detected", duration = 3, type = "warning"
+      )
+      msconvert <- find_msconvert()
+      raw_idx <- which(fext == "raw")
+      out_dir <- dirname(input$upload$datapath)[1]
+      withProgress(message = "Converting Raw to mzmL...", value = 0, {
+        for (i in raw_idx) {
+          run_msconvert(msconvert, input$upload$datapath[i], out_dir)
+          incProgress(
+            1/length(raw_idx),
+            detail = paste0("File: ", input$upload$name[i])
+          )
+          new_datapath <- paste0(
+            tools::file_path_sans_ext(input$upload$datapath[i]),
+            ".mzML"
+          )
+          input$upload$datapath[i] <- new_datapath
+        }
+      })
+    }
     tryCatch({
       has_spectra(input$upload$datapath) ## spectra validation
       input$upload
