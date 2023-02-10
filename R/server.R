@@ -16,44 +16,21 @@ server <- function(input, output, session) {
   ##############################################################################
   flist <- reactive({
     req(input$upload)
-    v$datapath <- input$upload$datapath
-    fext <- tolower(tools::file_ext(v$datapath))
-    if (any(fext == "raw")) {
-      showNotification(
-        "Thermo Raw files are detected", duration = 3, type = "warning"
-      )
-      msconvert <- find_msconvert()
-      raw_idx <- which(fext == "raw")
-      out_dir <- dirname(v$datapath)[1]
-      withProgress(message = "Converting Raw to mzmL...", value = 0, {
-        for (i in raw_idx) {
-          run_msconvert(msconvert, v$datapath[i], out_dir)
-          incProgress(
-            1/length(raw_idx),
-            detail = paste0("File: ", input$upload$name[i])
-          )
-          new_datapath <- paste0(
-            tools::file_path_sans_ext(v$datapath[i]),
-            ".mzML"
-          )
-          v$datapath[i] <- new_datapath
-        }
-      })
-    }
-    tryCatch({
-      ## has_spectra(input$upload$datapath) ## spectra validation
-      has_spectra(v$datapath) ## spectra validation
-      input$upload
-    }, error = function(e) {
-      ## Show notification for invalid files
-      showNotification(paste0(
-        "Input must be valid mass-spectrometry data files ",
-        "in open format (mzML, mzData, mzXML, and netCDF). ",
-        "Please re-upload new files."
-      ), duration = 5, type = "error", closeButton = FALSE)
-      Sys.sleep(6)
-      session$reload() ## reload session
-    })
+    input$upload
+    ## tryCatch({
+    ##   ## has_spectra(input$upload$datapath) ## spectra validation
+    ##   has_spectra(v$datapath) ## spectra validation
+    ##   input$upload
+    ## }, error = function(e) {
+    ##   ## Show notification for invalid files
+    ##   showNotification(paste0(
+    ##     "Input must be valid mass-spectrometry data files ",
+    ##     "in open format (mzML, mzData, mzXML, and netCDF). ",
+    ##     "Please re-upload new files."
+    ##   ), duration = 5, type = "error", closeButton = FALSE)
+    ##   Sys.sleep(6)
+    ##   session$reload() ## reload session
+    ## })
   })
 
   ##############################################################################
@@ -149,6 +126,43 @@ server <- function(input, output, session) {
   ## Read LC/MS data onto R via XCMS
   ##############################################################################
   observeEvent(flist(), {
+    v$datapath <- flist()$datapath
+    fext <- tolower(tools::file_ext(v$datapath))
+    if (any(fext == "raw")) {
+      showNotification(
+        "Thermo Raw files are detected", duration = 3, type = "warning"
+      )
+      msconvert <- find_msconvert()
+      raw_idx <- which(fext == "raw")
+      out_dir <- dirname(v$datapath)[1]
+      withProgress(message = "Converting Raw to mzmL...", value = 0, {
+        for (i in raw_idx) {
+          run_msconvert(msconvert, v$datapath[i], out_dir)
+          incProgress(
+            1/length(raw_idx),
+            detail = paste0("File: ", input$upload$name[i])
+          )
+          new_datapath <- paste0(
+            tools::file_path_sans_ext(v$datapath[i]),
+            ".mzML"
+          )
+          v$datapath[i] <- new_datapath
+        }
+      })
+    }
+    tryCatch({
+      ## has_spectra(input$upload$datapath) ## spectra validation
+      has_spectra(v$datapath) ## spectra validation
+    }, error = function(e) {
+      ## Show notification for invalid files
+      showNotification(paste0(
+        "Input must be valid mass-spectrometry data files ",
+        "in open format (mzML, mzData, mzXML, and netCDF). ",
+        "Please re-upload new files."
+      ), duration = 5, type = "error", closeButton = FALSE)
+      Sys.sleep(6)
+      session$reload() ## reload session
+    })
     v$fname <- tools::file_path_sans_ext(flist()$name)
     withProgress(message = "Reading Data...", value = 0, {
       v$raw <- MSnbase::readMSData(
