@@ -1,36 +1,48 @@
 server <- function(input, output, session) {
   ## Set file size limit
   options(shiny.maxRequestSize = 1000 * (1024**2))
+
+  ##############################################################################
+  ## Extend input for intermediate states
+  ##############################################################################
+  v <- reactiveValues(fname = NULL, raw = NULL, compound_dat = NULL,
+                      fdata = NULL, massspec = NULL, scan_choices = NULL,
+                      peak = NULL, ui_nopeak = FALSE, feature = NULL,
+                      datapath = NULL)
+
+
   ##############################################################################
   ## Validate files have spectra
   ##############################################################################
   flist <- reactive({
     req(input$upload)
-    fext <- tolower(tools::file_ext(input$upload$datapath))
+    v$datapath <- input$upload$datapath
+    fext <- tolower(tools::file_ext(v$datapath))
     if (any(fext == "raw")) {
       showNotification(
         "Thermo Raw files are detected", duration = 3, type = "warning"
       )
       msconvert <- find_msconvert()
       raw_idx <- which(fext == "raw")
-      out_dir <- dirname(input$upload$datapath)[1]
+      out_dir <- dirname(v$datapath)[1]
       withProgress(message = "Converting Raw to mzmL...", value = 0, {
         for (i in raw_idx) {
-          run_msconvert(msconvert, input$upload$datapath[i], out_dir)
+          run_msconvert(msconvert, v$datapath[i], out_dir)
           incProgress(
             1/length(raw_idx),
             detail = paste0("File: ", input$upload$name[i])
           )
           new_datapath <- paste0(
-            tools::file_path_sans_ext(input$upload$datapath[i]),
+            tools::file_path_sans_ext(v$datapath[i]),
             ".mzML"
           )
-          input$upload$datapath[i] <- new_datapath
+          v$datapath[i] <- new_datapath
         }
       })
     }
     tryCatch({
-      has_spectra(input$upload$datapath) ## spectra validation
+      ## has_spectra(input$upload$datapath) ## spectra validation
+      has_spectra(v$datapath) ## spectra validation
       input$upload
     }, error = function(e) {
       ## Show notification for invalid files
@@ -43,13 +55,6 @@ server <- function(input, output, session) {
       session$reload() ## reload session
     })
   })
-
-  ##############################################################################
-  ## Extend input for intermediate states
-  ##############################################################################
-  v <- reactiveValues(fname = NULL, raw = NULL, compound_dat = NULL,
-                      fdata = NULL, massspec = NULL, scan_choices = NULL,
-                      peak = NULL, ui_nopeak = FALSE, feature = NULL)
 
   ##############################################################################
   ## Conditional UI for m/z specification
@@ -147,7 +152,8 @@ server <- function(input, output, session) {
     v$fname <- tools::file_path_sans_ext(flist()$name)
     withProgress(message = "Reading Data...", value = 0, {
       v$raw <- MSnbase::readMSData(
-        flist()$datapath,
+        ## flist()$datapath,
+        v$datapath,
         pdata = new(
           "NAnnotatedDataFrame",
           data.frame(idx = seq_len(nrow(input$upload)),
