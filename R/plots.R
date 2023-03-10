@@ -50,7 +50,7 @@ p_bpc_mass <- function(x, rtrange = NULL, type = c("max", "sum"),
   event_register(p, "plotly_click")
 }
 
-p_massspec <- function(x, scan, yaxis) {
+p_massspec <- function(x, scan, yaxis, top_n = 5) {
   x <- x[sprintf("%.5f", rt) == sprintf("%.5f", as.numeric(scan))]
   setnames(x, old = c("mz", "i"), new = c("m/z", "Intensity"))
   if (yaxis == "Relative Abundance") {
@@ -61,8 +61,13 @@ p_massspec <- function(x, scan, yaxis) {
   } else {
     ytitle <- c("Intensity")
   }
+  top_idx <- order(x$Intensity, decreasing = TRUE)[seq_len(top_n)]
+  top_d <- x[top_idx, ]
+  top_d[, mz_label := sprintf("%.4f", `m/z`)]
   p <- ggplot(x, aes(x = `m/z`, ymin = 0, ymax = Intensity)) +
     geom_linerange() +
+    geom_text(data = top_d, aes(y = Intensity, label = mz_label),
+              size = 3, color = "magenta") +
     theme_bw() +
     labs(title = paste0("Scan Time: ", sprintf("%.5f", as.numeric(scan)))) +
     ylab(ytitle) +
