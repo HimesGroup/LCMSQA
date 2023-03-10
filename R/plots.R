@@ -1,6 +1,10 @@
-get_multp_nrow <- function(n_plots) {
-  n_cols <- ceiling(sqrt(n_plots))
-  ceiling(n_plots / n_cols)
+get_multp_nrow <- function(n_plots, fixed_ncol = 2) {
+  if (!is.null(fixed_ncol)) {
+    ceiling(n_plots / fixed_ncol)
+  } else {
+    n_cols <- ceiling(sqrt(n_plots))
+    ceiling(n_plots / n_cols)
+  }
 }
 
 p_tic <- function(x, type = c("sum", "max"), facet = TRUE) {
