@@ -1,4 +1,4 @@
-featuredetection_ui <- function(compound_dat) {
+featuredetection_ui <- function(compound_dat, standard_skip = FALSE) {
   fluidRow(
     column(
       12,
@@ -9,13 +9,13 @@ featuredetection_ui <- function(compound_dat) {
     column(
       12,
       h5("1. m/z and retention time of interest", style = "color:orange"),
-      checkboxInput("manual", "set m/z manually",
-                    value = FALSE)
+      if (!standard_skip) {
+        checkboxInput("manual", "set m/z manually", value = FALSE)
+      }
     ),
-    column(
-      6,
-      conditionalPanel(
-        condition = "input.manual == 1",
+    if (standard_skip) {
+      column(
+        6,
         wellPanel(
           "m/z  (± ppm)",
           fluidRow(
@@ -28,35 +28,55 @@ featuredetection_ui <- function(compound_dat) {
               textInput("xic_mz_err", "", value = 10, placeholder = "ppm")
             )
           )
-        ),
-        br()
-      ),
-      conditionalPanel(
-        condition = "input.manual == 0",
-        wellPanel(
-          "compound (± ppm)",
-          fluidRow(
-            column(
-              9,
-              selectizeInput(
-                "compound", "",
-                choices = list(
-                  `Positive Mode` = compound_dat[mode == "positive"]$id,
-                  `Negative Mode` = compound_dat[mode == "negative"]$id
-                ),
-                selected = compound_dat$id[1]
+        )
+      )
+    } else {
+      column(
+        6,
+        conditionalPanel(
+          condition = "input.manual == 1",
+          wellPanel(
+            "m/z  (± ppm)",
+            fluidRow(
+              column(
+                9,
+                textInput("xic_mz_val", "", value = NULL, placeholder = "m/z")
+              ),
+              column(
+                3,
+                textInput("xic_mz_err", "", value = 10, placeholder = "ppm")
               )
-            ),
-            column(
-              3,
-              textInput("xic_mz_window", "", value = 10, placeholder = "ppm")
             )
           ),
-          style = "padding-bottom: 8px"
+          br()
         ),
-        br()
-      ),
-    ),
+        conditionalPanel(
+          condition = "input.manual == 0",
+          wellPanel(
+            "compound (± ppm)",
+            fluidRow(
+              column(
+                9,
+                selectizeInput(
+                  "compound", "",
+                  choices = list(
+                    `Positive Mode` = compound_dat[mode == "positive"]$id,
+                    `Negative Mode` = compound_dat[mode == "negative"]$id
+                  ),
+                  selected = compound_dat$id[1]
+                )
+              ),
+              column(
+                3,
+                textInput("xic_mz_window", "", value = 10, placeholder = "ppm")
+              )
+            ),
+            style = "padding-bottom: 8px"
+          ),
+          br()
+        )
+      )
+    },
     column(
       6,
       wellPanel(
