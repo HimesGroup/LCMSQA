@@ -1,4 +1,4 @@
-maintabs_ui <- function(fdata) {
+maintabs_ui <- function(fdata, standard_skip = FALSE) {
   tabsetPanel(
     id = "tabs",
     tabPanel(
@@ -65,10 +65,12 @@ maintabs_ui <- function(fdata) {
       uiOutput("peak_tbl"),
       uiOutput("peak_fig")
     ),
-    tabPanel(
-      "Standard Information",
-      br(),
-      DTOutput("standard_tbl")
-    )
+    if (!standard_skip) {
+      tabPanel(
+        "Standard Information",
+        br(),
+        DTOutput("standard_tbl")
+      )
+    }
   )
 }

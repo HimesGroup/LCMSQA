@@ -33,7 +33,8 @@ server <- function(input, output, session) {
   ## Conditional UI for m/z specification
   ##############################################################################
   mz_manual <- reactive({
-    if (isTruthy(input$manual)) {
+    if (isTruthy(input$manual) ||
+        (!is.null(input$standard_skip) & isTruthy(input$standard_skip))) {
       TRUE
     } else {
       FALSE
@@ -156,7 +157,7 @@ server <- function(input, output, session) {
           )
         ),
         div(style = "margin-top: -20px"),
-        checkboxInput("standard_skip", "Skip and use the default list")
+        checkboxInput("standard_skip", "Skip and specify m/z manually")
       )
     )
     observeEvent({
@@ -164,44 +165,54 @@ server <- function(input, output, session) {
       input$standard_skip
     }, {
       if (isTruthy(input$standard_info) || input$standard_skip) {
-        if (!is.null(input$standard_info)) {
-          v$compound_dat <- fread(input$standard_info$datapath, sep = ",")
-        } else {
-          v$compound_dat <- copy(IS_Info)
-        }
-        if (has_all_columns(v$compound_dat)) {
-          v$compound_dat[, id := paste(compound, adduct, sep = " ")]
+        if (is.null(input$standard_info)) {
           hide("upload")
           hide("standard_info")
           hide("standard_skip")
           output$featuredetection <- renderUI(
             tagList(
-              featuredetection_ui(v$compound_dat)
+              featuredetection_ui(v$compound_dat, input$standard_skip)
             )
           )
           output$tabs <- renderUI(
-            maintabs_ui(v$fdata)
-          )
-          d <- v$compound_dat[, -c("id")]
-          setnames(d, old = "mz", new = "m/z")
-          setcolorder(d, c("compound", "adduct", "mode", "m/z"))
-          output$standard_tbl <- renderDT(
-            datatable(
-              d,
-              selection = "none",
-              extensions = "Buttons",
-              options = list(
-                dom = "Bfrtip", buttons = c('copy', 'csv', 'excel')
-              )
-            )
+            maintabs_ui(v$fdata, input$standard_skip)
           )
         } else {
-          showNotification(
-            paste0("Input must have the following columns: ",
-                   "compound, adduct, mode, and mz. ",
-                   "Please re-upload a valid file."),
-            duration = 5, type = "error", closeButton = FALSE
-          )
+          v$compound_dat <- fread(input$standard_info$datapath, sep = ",")
+          if (has_all_columns(v$compound_dat)) {
+            v$compound_dat[, id := paste(compound, adduct, sep = " ")]
+            hide("upload")
+            hide("standard_info")
+            hide("standard_skip")
+            output$featuredetection <- renderUI(
+              tagList(
+                featuredetection_ui(v$compound_dat)
+              )
+            )
+            output$tabs <- renderUI(
+              maintabs_ui(v$fdata)
+            )
+            d <- v$compound_dat[, -c("id")]
+            setnames(d, old = "mz", new = "m/z")
+            setcolorder(d, c("compound", "adduct", "mode", "m/z"))
+            output$standard_tbl <- renderDT(
+              datatable(
+                d,
+                selection = "none",
+                extensions = "Buttons",
+                options = list(
+                  dom = "Bfrtip", buttons = c('copy', 'csv', 'excel')
+                )
+              )
+            )
+          } else {
+            showNotification(
+              paste0("Input must have the following columns: ",
+                     "compound, adduct, mode, and mz. ",
+                     "Please re-upload a valid file."),
+              duration = 5, type = "error", closeButton = FALSE
+            )
+          }
         }
       }
     })
