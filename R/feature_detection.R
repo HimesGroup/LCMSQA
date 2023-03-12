@@ -132,20 +132,20 @@ featuredetection_ui <- function(compound_dat) {
     column(
       4,
       bs_embed_tooltip(
-        numericInput("pre_peak", "pre-filter: peaks", 3)
+        numericInput("pre_peak", "prefilter: peaks", 3)
       )
     ),
     column(
       4,
       bs_embed_tooltip(
-        numericInput("pre_int", "pre-filter: intensity", 100),
+        numericInput("pre_int", "prefilter: intensity", 100),
         "Minimum intensity to keep mass traces for the ROI detection of centWave"
       )
     ),
     column(
       4,
       bs_embed_tooltip(
-        selectInput("gauss", "Gaussian Fit", choices = c("False", "True"),
+        selectInput("gauss", "Gaussian fit", choices = c("False", "True"),
                     selected = "False"),
         "Whether or not a Gaussian should be fitted to each peak"
       )

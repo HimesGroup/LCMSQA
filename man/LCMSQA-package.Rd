@@ -4,9 +4,72 @@
 \name{LCMSQA-package}
 \alias{LCMSQA}
 \alias{LCMSQA-package}
-\title{LCMSQA: What the Package Does (One Line, Title Case)}
+\title{LC/MS Quality Assessment}
 \description{
-What the package does (one paragraph).
+The LCMSQA package is designed to assess the quality of LC/MS experiment
+using a user-friendly web application built with Shiny. It utilizes the
+\link\link{xcms} workflow for data import, visualization, and quality check of
+LC/MS experiments.
+
+The application consists of four main tabs:
+\itemize{
+\item Total Ion Chromatogram (and Base Peak Chromatogram)
+\item Extracted Ion Chromatogram (XIC)
+\item Mass Spectrum
+\item Metabolic Feature Detection
+}
+
+Please check the vignette for the details (Run
+\code{vignette("Introduction to LCMSQA", package = "LCMSQA")}).
+}
+\details{
+The application needs the following inputs:
+\itemize{
+\item (required) mass-spectrometry data files in open formats: AIA/ANDI NetCDF,
+mzXML, mzData and mzML.
+\item (optional) internal standard information in a CSV format with the columns:
+\itemize{
+\item compound: the name of compound
+\item adduct: adduct type (e.g., [M+H]+)
+\item mode: must be either "positive" or "negative"
+\item mz: a known mass-to-charge ratio (m/z) value
+}
+}
+
+In the application UI, a user can tune the following parameters:
+\itemize{
+\item Set m/z and retention time of interest
+\itemize{
+\item compound (or m/z) with a ppm tolerance
+\item retention time in second (min, max)
+}
+\item Peak picking using the centWave method (see \link[xcms:findChromPeaks-centWave]{xcms::CentWaveParam})
+\itemize{
+\item ppm: the maximal tolerated m/z deviation in consecutive scans in ppm for
+the initial region of interest (ROI) definition
+\item peak width: the expected approximate peak width in chromatographic space
+\item signal/noise cut: the signal to noise ratio cutoff
+\item m/z diff: the minimum difference in m/z dimension required for peaks
+with overlapping retention times
+\item noise: a minimum intensity required for centroids to be considered in
+the first analysis step
+\item prefilter (>= peaks, >= intensity): the prefilter step for the first
+analysis step (ROI detection)
+\item Gaussian fit: whether or not a Gaussian should be fitted to each peak
+\item m/z center: the function to calculate the m/z center of the
+chromatographic peaks
+\item integration: whether or not peak limits are found through descent on the
+Mexican Hat filtered data
+}
+\item Peak grouping using the peak density method (see \link[xcms:groupChromPeaks-density]{xcms::PeakDensityParam})
+\itemize{
+\item bandwidth: the bandwidth (standard deviation of the smoothing kernel) to
+be used
+\item min fraction: the minimum fraction of samples in which the peaks has to
+be detected to define a peak group
+\item bin size: the size of overlapping slices in m/z dimension
+}
+}
 }
 \author{
 \strong{Maintainer}: Jaehyun Joo \email{jaehyunjoo@outlook.com}
@@ -17,4 +80,3 @@ Authors:
 }
 
 }
-\keyword{internal}

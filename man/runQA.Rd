@@ -2,19 +2,18 @@
 % Please edit documentation in R/runQA.R
 \name{runQA}
 \alias{runQA}
-\title{Start LCMS QA application}
+\title{Start LC/MS QA application}
 \usage{
 runQA()
-}
-\arguments{
-\item{BPPARAM}{A \link[BiocParallel:BiocParallelParam-class]{BiocParallel::BiocParallelParam} object}
 }
 \value{
 This function normally does not return; interrupt R to stop the
 application (usually by pressing Ctrl + C or ESC)
 }
 \description{
-Start LCMS QA application
+Runs a Shiny application to check the quality of LC/MS experiment. The
+system's default web browser will be launched automatically after the app is
+started.
 }
 \examples{
 
