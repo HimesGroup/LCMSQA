@@ -34,9 +34,9 @@ maintabs_ui <- function(fdata) {
           selected = "Relative Abundance"
         )
       ),
-      h5("Base peak chromatogram", style = "color:skyblue"),
-      uiOutput("massbpc_slider"),
-      withSpinner(plotlyOutput("massbpc")),
+      h5("Chromatogram", style = "color:skyblue"),
+      uiOutput("masschrom_slider"),
+      withSpinner(plotlyOutput("masschrom")),
       h5("Mass spectrum", style = "color:lightcoral"),
       br(),
       withSpinner(plotlyOutput("massspec"))

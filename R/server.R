@@ -6,7 +6,7 @@ server <- function(input, output, session) {
   ## Extend input for intermediate states
   ##############################################################################
   v <- reactiveValues(fname = NULL, raw = NULL, compound_dat = NULL,
-                      fdata = NULL, p_mass_bpc = NULL, mass_dat = NULL,
+                      fdata = NULL, p_mass_chrom = NULL, mass_dat = NULL,
                       peak = NULL, ui_nopeak = FALSE, feature = NULL,
                       datapath = NULL)
 
@@ -304,34 +304,34 @@ server <- function(input, output, session) {
   observeEvent(input$massspec_file, {
     output$massspec <- renderPlotly(NULL) ## hide spinner
     rt_max <- ceiling(max(v$fdata[file == input$massspec_file]$rt) / 10) * 10
-    output$massbpc_slider <- renderUI(tagList(
+    output$masschrom_slider <- renderUI(tagList(
       br(),
       sliderInput(
-        "massbpc_rt", "Retention Time Range",
+        "masschrom_rt", "Retention Time Range",
         min = 0, max = rt_max, value = c(0, rt_max), step = 30
       )
     ))
     v$mass_dat <- v$fdata[file == input$massspec_file]
     if (!is.null(v$mass_dat)) {
-      output$massbpc <- renderPlotly({
-        v$p_mass_bpc <- tryCatch(
-          p_bpc_mass(v$mass_dat, rtrange = input$massbpc_rt),
+      output$masschrom <- renderPlotly({
+        v$p_mass_chrom <- tryCatch(
+          p_mass_chrom(v$mass_dat, rtrange = input$masschrom_rt),
           warning = function(w) NULL,
           error = function(e) NULL
         )
       })
     }
     observeEvent({
-      req(v$p_mass_bpc)
-      event_data("plotly_click", source = "mass_bpc")
+      req(v$p_mass_chrom)
+      event_data("plotly_click", source = "mass_chrom")
       v$mass_dat
     }, {
-      d <- event_data("plotly_click", source = "mass_bpc")
+      d <- event_data("plotly_click", source = "mass_chrom")
       output$massspec <- renderPlotly({
         tryCatch(
           p_massspec(
             v$mass_dat,
-            scan = d$x, yaxis = input$yaxis
+            scan = d$x[1], yaxis = input$yaxis
           ),
           warning = function(w) NULL,
           error = function(e) NULL

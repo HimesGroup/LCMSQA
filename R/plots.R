@@ -31,22 +31,25 @@ p_tic <- function(x, type = c("sum", "max"), facet = TRUE) {
   ggplotly(p, height = 350 * n_rows)
 }
 
-p_bpc_mass <- function(x, rtrange = NULL, type = c("max", "sum"),
-                       source = "mass_bpc") {
-  type <- match.arg(type)
+p_mass_chrom <- function(x, rtrange = NULL, source = "mass_chrom") {
   if (!is.null(rtrange)) {
     x <- x[rt >= rtrange[1] & rt <= rtrange[2]]
   }
-  if (type == "sum") {
-    x <- x[, .(Intensity = sum(i)), by = .(file, rt)]
-  } else {
-    x <- x[, .(Intensity = max(i)), by = .(file, rt)]
-  }
+  x_sum <- x[, .(Intensity = sum(i)), by = .(file, rt)]
+  x_max <- x[, .(Intensity = max(i)), by = .(file, rt)]
+  x_sum[, Chromatogram := "Total Ion Current"]
+  x_max[, Chromatogram := "Base Peak"]
+  x <- rbind(x_sum, x_max)
   setnames(x, old = c("rt", "file"), new = c("Retention Time", "File"))
-  p <- ggplot(x, aes(x = `Retention Time`, y = Intensity)) +
+  p <- ggplot(x, aes(x = `Retention Time`, y = Intensity, color = Chromatogram)) +
     geom_line() +
-    theme_bw()
-  p <- ggplotly(p, source = source)
+    theme_bw() +
+    theme(legend.position = "none")
+  p <- layout(
+    ggplotly(p, source = source), hovermode = "x",
+    xaxis = list(showspikes = TRUE, spikemode = "toaxis+across",
+                 spikedash = "longdash", spikethickness = 1.5, spikecolor = "gray")
+  )
   event_register(p, "plotly_click")
 }
 
