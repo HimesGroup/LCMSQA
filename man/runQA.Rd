@@ -17,6 +17,8 @@ started.
 }
 \examples{
 
-\donttest{runQA()}
+if (interactive()) {
+  runQA()
+}
 
 }
