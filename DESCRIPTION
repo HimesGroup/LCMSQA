@@ -30,3 +30,7 @@ Imports:
     shinyjs,
     shinyWidgets,
     xcms
+Suggests:
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
