@@ -121,7 +121,7 @@ grouping).
  - compound (or m/z) with a ppm tolerance
  - retention time in second (min, max)
 
-### 2. Peak picking using the [centWave](https://rdrr.io/bioc/xcms/man/findChromPeaks-centWave.html) method
+### 2. Peak picking using the [centWave](https://sneumann.github.io/xcms/reference/findChromPeaks-centWave.html) method
 
 - ppm: the maximal tolerated m/z deviation in consecutive scans in ppm for the
    initial region of interest (ROI) definition
@@ -139,7 +139,7 @@ grouping).
 - integration: whether or not peak limits are found through descent on the
   Mexican Hat filtered data
 
-### 3. Peak grouping using the [peak density](https://rdrr.io/bioc/xcms/man/groupChromPeaks-density.html) method
+### 3. Peak grouping using the [peak density](https://sneumann.github.io/xcms/reference/groupChromPeaks-density.html) method
 
 - bandwidth: the bandwidth (standard deviation of the smoothing kernel) to be
   used
