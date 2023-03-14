@@ -8,7 +8,9 @@
 ##'   application (usually by pressing Ctrl + C or ESC)
 ##' @examples
 ##'
-##' \donttest{runQA()}
+##' if (interactive() {
+##'   runQA()
+##' })
 ##'
 ##' @export
 runQA <- function() {

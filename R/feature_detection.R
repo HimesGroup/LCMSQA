@@ -17,7 +17,7 @@ featuredetection_ui <- function(compound_dat) {
       conditionalPanel(
         condition = "input.manual == 1",
         wellPanel(
-          "m/z  (± ppm)",
+          "m/z  (\u00b1 ppm)",
           fluidRow(
             column(
               9,
@@ -34,7 +34,7 @@ featuredetection_ui <- function(compound_dat) {
       conditionalPanel(
         condition = "input.manual == 0",
         wellPanel(
-          "compound (± ppm)",
+          "compound (\u00b1 ppm)",
           fluidRow(
             column(
               9,
