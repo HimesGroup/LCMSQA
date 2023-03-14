@@ -83,3 +83,15 @@ get_machine_val <- function(machine, machine_list, values) {
   values[[machine]]
   ## do.call(switch, c(machine, as.list(values)))
 }
+
+
+################################################################################
+## Define global variables due to non-standard evaluation
+################################################################################
+utils::globalVariables(
+         c(".", "..keep_cols", ".SD", "Area", "Chromatogram", "File",
+           "Intensity", "Retention Time", "adduct", "area", "compound",
+           "fname", "i", "id", "into", "label", "m/z", "maxo", "mz", "mz_label",
+           "mzmax", "mzmin", "mzmed", "rt", "rtmax", "rtmin", "rtmed", "title",
+           "xmax", "xmin", "ymax", "ymin")
+       )

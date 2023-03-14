@@ -64,6 +64,7 @@
 ##'   isTruthy observe updateNumericInput updateSliderInput observeEvent
 ##'   withProgress incProgress renderUI div checkboxInput updateTabsetPanel
 ##'   updateSelectizeInput removeNotification showModal modalDialog removeModal
+##'   column textInput sliderInput selectInput tags tagList
 ##' @importFrom shinyWidgets pickerInput updatePickerInput
 ##' @importFrom shinycssloaders withSpinner
 ##' @importFrom DT DTOutput renderDT datatable

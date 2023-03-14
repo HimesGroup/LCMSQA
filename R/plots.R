@@ -169,7 +169,7 @@ p_feature_area <- function(x, title, log2, show_val) {
   x[, label := sprintf("%.2f", Area)]
   title <- NULL
   if (nrow(x) > 1) {
-    area_sd <- sd(x$Area)
+    area_sd <- stats::sd(x$Area)
     if (is.na(area_sd)) {
       area_rsd <- "N/A"
     } else{
