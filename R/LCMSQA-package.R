@@ -81,5 +81,7 @@
 ##' @importFrom xcms CentWaveParam PeakDensityParam
 ##' @importMethodsFrom xcms findChromPeaks chromPeaks groupChromPeaks
 ##'   featureDefinitions featureValues filterFile filterRt filterMz
+##' @importFrom MSnbase readMSData hasSpectra
+##' @importMethodsFrom MSnbase pData
 "_PACKAGE"
 

@@ -1,5 +1,3 @@
-.onLoad <- function(...){
-  suppressPackageStartupMessages(require("MSnbase", quietly = TRUE))
-  suppressPackageStartupMessages(require("BiocParallel", quietly = TRUE))
+.onAttach <- function(...) {
   packageStartupMessage("Welcome to the LCMSQA package!")
 }
