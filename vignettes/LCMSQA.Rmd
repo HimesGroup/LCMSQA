@@ -38,13 +38,14 @@ library(LCMSQA)
 Most methods in `xcms` support parallel processing via
 *[BiocParallel](https://bioconductor.org/packages/3.15/BiocParallel)* to save
 time. We highly recommend to initiate the parallel processing setup explicitly
-before starting the app (especially for Windows systems).
+before starting the app.
 
 To initiate `multicore`-based parallel evaluation in Unix-based systems
 (e.g., Linux, macOS),
 
 ```{r unix parallel}
 ## Unix-based systems
+library(BiocParallel)
 register(bpstart(MulticoreParam()))
 ```
 
@@ -53,6 +54,7 @@ On Windows, `MulticoreParam` results in serial evaluation. Please use
 
 ```{r windows parallel}
 ## Windows system
+library(BiocParallel)
 register(bpstart(SnowParam()))
 ```
 
@@ -73,7 +75,12 @@ started.
 ## Example Data
 
 The example data used in this vignette can be downloaded from the following
-links: [QC_sample1.mzML](), [QC_sample2.mzML](), and [IS_info.csv]().
+links:
+[QC_sample1.mzML](https://github.com/HimesGroup/package_example_data/raw/main/LCMSQA/example1.mzML),
+[QC_sample2.mzML](https://github.com/HimesGroup/package_example_data/raw/main/LCMSQA/example2.mzML),
+and
+[IS_info.csv](https://github.com/HimesGroup/package_example_data/raw/main/LCMSQA/IS_info.csv)
+(right click -> save link as).
 
 ## File Input
 
