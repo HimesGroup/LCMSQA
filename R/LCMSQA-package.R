@@ -4,8 +4,8 @@
 ##'
 ##' The LCMSQA package is designed to assess the quality of LC/MS experiment
 ##' using a user-friendly web application built with Shiny. It utilizes the
-##' \link[xcms] workflow for data import, visualization, and quality check of
-##' LC/MS experiments.
+##' [xcms] workflow for data import, visualization, and quality check of LC/MS
+##' experiments.
 ##'
 ##' The application consists of four main tabs:
 ##'
@@ -14,8 +14,8 @@
 ##' - Mass Spectrum
 ##' - Metabolic Feature Detection
 ##'
-##' Please check the vignette for the details (Run
-##' \code{vignette("Introduction to LCMSQA", package = "LCMSQA")}).
+##' Please check the vignette for the details (Run \code{vignette("LCMSQA",
+##' package = "LCMSQA")}).
 ##'
 ##' @details
 ##' The application needs the following inputs:
@@ -82,3 +82,4 @@
 ##' @importMethodsFrom xcms findChromPeaks chromPeaks groupChromPeaks
 ##'   featureDefinitions featureValues filterFile filterRt filterMz
 "_PACKAGE"
+

@@ -189,7 +189,7 @@ server <- function(input, output, session) {
     output$standard <- renderUI(
       tagList(
         bs_embed_popover(
-          fileInput("standard_info", "Provide standard information",
+          fileInput("standard_info", "Provide internal standard information",
                     multiple = FALSE, accept = list(".csv")),
           paste0(
             "Input must be a csv file with the following columns: ",
