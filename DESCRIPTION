@@ -1,6 +1,6 @@
 Package: LCMSQA
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: LC/MS Quality Assessment
+Version: 1.0.0
 Authors@R: c(
     person(given = "Jaehyun",
            family = "Joo",
@@ -8,14 +8,19 @@ Authors@R: c(
            email = "jaehyunjoo@outlook.com"),
     person(given = "Blanca",
            family = "Himes",
-           role = c("aut"),
-           email = "bhimes@pennmedicine.upenn.edu"))
-Description: What the package does (one paragraph).
+           role = c("aut"))
+           )
+Description: The goal of LCMSQA is to make it easy to check the quality of LC/MS
+             experiments using a Shiny application. This package provides
+             interactive data visualizations for quality control (QC) samples,
+             including total ion current chromatogram (TIC), base peak
+             chromatogram (BPC), mass spectrum, extracted ion chromatogram
+             (XIC), and feature detection results from internal standards or
+             known metabolites.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-biocViews: Metabolomics
 Depends:
     R (>= 3.10)
 Imports:
