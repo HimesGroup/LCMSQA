@@ -7,9 +7,9 @@
 \title{LC/MS Quality Assessment}
 \description{
 The LCMSQA package is designed to assess the quality of LC/MS experiment
-using a user-friendly web application built with Shiny. It utilizes the
-\link{xcms} workflow for data import, visualization, and quality check of LC/MS
-experiments.
+using a user-friendly web application built with Shiny. It utilizes the R
+package xcms workflow for data import, visualization, and quality check of
+LC/MS experiments.
 
 The application consists of four main tabs:
 \itemize{
