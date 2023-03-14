@@ -167,7 +167,7 @@ server <- function(input, output, session) {
     })
     v$fname <- tools::file_path_sans_ext(flist()$name)
     withProgress(message = "Reading Data...", value = 0, {
-      v$raw <- MSnbase::readMSData(
+      v$raw <- readMSData(
         ## flist()$datapath,
         v$datapath,
         pdata = new(
@@ -175,7 +175,7 @@ server <- function(input, output, session) {
           data.frame(idx = seq_len(nrow(input$upload)),
                      fname = factor(v$fname, levels = v$fname))
         ),
-        msLevel. = 1, centroided. = TRUE, mode = "onDisk"
+        msLevel. = 1, mode = "onDisk"
       )
       n <- nrow(flist())
       dl <- list()
@@ -403,7 +403,7 @@ server <- function(input, output, session) {
       } else {
         fdef <- as.data.table(featureDefinitions(res), keep.rownames = "feature")
         fval <- as.data.table(featureValues(res), keep.rownames = "feature")
-        colnames(fval)[-1] <- as.character(MSnbase::pData(raw_sub)$fname)
+        colnames(fval)[-1] <- as.character(pData(raw_sub)$fname)
         mz_cols <- c("mzmed", "mzmin", "mzmax")
         rt_cols <- c("rtmed", "rtmin", "rtmax")
         v$feature <- merge(fdef, fval, sort = FALSE)
@@ -473,7 +473,7 @@ server <- function(input, output, session) {
       DTOutput("feature_peak_map")
     ))
     peaklist <- as.data.table(v$peak)[v$feature$peakidx[[idx]], ]
-    peak_sub <- merge(peaklist, MSnbase::pData(v$raw), by.x = "sample",
+    peak_sub <- merge(peaklist, pData(v$raw), by.x = "sample",
                       by.y = "idx", sort = FALSE)
     peak_tbl <- copy(peak_sub)
     mz_cols <- c("mz", "mzmin", "mzmax")

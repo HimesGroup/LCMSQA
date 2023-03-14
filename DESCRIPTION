@@ -21,7 +21,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-biocViews: Metabolomics
+biocViews:
 Depends:
     R (>= 3.10)
 Imports:
@@ -35,4 +35,5 @@ Imports:
     shinycssloaders,
     shinyjs,
     shinyWidgets,
-    xcms
+    xcms,
+    MSnbase
