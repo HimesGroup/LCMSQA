@@ -1,5 +1,9 @@
 # LCMSQA
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/HimesGroup/LCMS_QA/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/HimesGroup/LCMS_QA/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 The goal of LCMSQA is to make it easy to check the quality of LC/MS experiments
 using a Shiny application. This package provides interactive data visualizations
 for quality control (QC) samples, including total ion current chromatogram
