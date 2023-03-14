@@ -8,9 +8,9 @@
 ##'   application (usually by pressing Ctrl + C or ESC)
 ##' @examples
 ##'
-##' if (interactive() {
+##' if (interactive()) {
 ##'   runQA()
-##' })
+##' }
 ##'
 ##' @export
 runQA <- function() {

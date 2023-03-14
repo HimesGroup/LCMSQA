@@ -17,8 +17,8 @@ started.
 }
 \examples{
 
-if (interactive() {
+if (interactive()) {
   runQA()
-})
+}
 
 }
