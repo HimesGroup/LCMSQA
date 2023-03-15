@@ -11,12 +11,13 @@ This function normally does not return; interrupt R to stop the
 application (usually by pressing Ctrl + C or ESC)
 }
 \description{
-Runs a Shiny application to check the quality of LC/MS experiment. The
+Runs a 'shiny' application to check the quality of LC/MS experiment. The
 system's default web browser will be launched automatically after the app is
 started.
 }
 \examples{
 
+## Please check the package vignette for details on how to use the app
 if (interactive()) {
   runQA()
 }

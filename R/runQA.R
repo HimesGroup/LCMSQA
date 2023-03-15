@@ -1,6 +1,6 @@
 ##' Start LC/MS QA application
 ##'
-##' Runs a Shiny application to check the quality of LC/MS experiment. The
+##' Runs a 'shiny' application to check the quality of LC/MS experiment. The
 ##' system's default web browser will be launched automatically after the app is
 ##' started.
 ##'
@@ -8,6 +8,7 @@
 ##'   application (usually by pressing Ctrl + C or ESC)
 ##' @examples
 ##'
+##' ## Please check the package vignette for details on how to use the app
 ##' if (interactive()) {
 ##'   runQA()
 ##' }
