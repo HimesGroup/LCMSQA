@@ -15,11 +15,12 @@ knitr::opts_chunk$set(
 )
 ```
 
-The goal of LCMSQA is to make it easy to check the quality of LC/MS experiments
-using a Shiny application. It uses the
-*[xcms](https://bioconductor.org/packages/3.15/xcms)* workflow for data import,
-visualization, and feature detection of internal standards or known metabolites
-that can be used to evaluate and adapt the peak detection settings.
+The goal of '**LCMSQA**' is to make it easy to check the quality of liquid
+chromatography/mass spectrometry (LC/MS) experiments using a
+'**[shiny](https://cran.r-project.org/package=shiny)**' application. It uses the
+R package '**[xcms](https://bioconductor.org/packages/xcms/)**' workflow for
+data import, visualization, and feature detection of internal standards or known
+metabolites that can be used to evaluate and adapt the peak detection settings.
 
 ## Installation
 
@@ -36,7 +37,7 @@ library(LCMSQA)
 ## Parallel Processing
 
 Most methods in `xcms` support parallel processing via
-*[BiocParallel](https://bioconductor.org/packages/3.15/BiocParallel)* to save
+'**[BiocParallel](https://bioconductor.org/packages/BiocParallel/)**' to save
 time. We highly recommend to initiate the parallel processing setup explicitly
 before starting the app.
 
@@ -86,10 +87,11 @@ and
 
 The app needs the following input:
 
-1. (required) mass-spectrometry data files in open formats: AIA/ANDI NetCDF,
-  mzXML, mzData and mzML
+1. (required) mass-spectrometry data files of quality control (QC) samples in
+  open formats: AIA/ANDI NetCDF, mzXML, mzData and mzML
 
-Check *[msconvert](https://proteowizard.sourceforge.io/tools/msconvert.html)* if
+Check
+'**[msconvert](https://proteowizard.sourceforge.io/tools/msconvert.html)**' if
 you have data in different formats. Multiple files can be selected.
 
 

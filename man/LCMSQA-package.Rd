@@ -6,10 +6,11 @@
 \alias{LCMSQA-package}
 \title{LC/MS Quality Assessment}
 \description{
-The LCMSQA package is designed to assess the quality of LC/MS experiment
-using a user-friendly web application built with Shiny. It utilizes the R
-package xcms workflow for data import, visualization, and quality check of
-LC/MS experiments.
+The 'LCMSQA' package is designed to assess the quality of liquid
+chromatography/mass spectrometry (LC/MS) experiment using a user-friendly
+web application built with the R package 'shiny'. It utilizes the R package
+'xcms' workflow for data import, visualization, and quality check of LC/MS
+experiments.
 
 The application consists of four main tabs:
 \itemize{
@@ -25,8 +26,8 @@ package = "LCMSQA")}).
 \details{
 The application needs the following inputs:
 \itemize{
-\item (required) mass-spectrometry data files in open formats: AIA/ANDI NetCDF,
-mzXML, mzData and mzML.
+\item (required) mass-spectrometry data files of quality control (QC) samples in
+open formats: AIA/ANDI NetCDF, mzXML, mzData and mzML.
 \item (optional) internal standard information in a CSV format with the columns:
 \itemize{
 \item compound: the name of compound
