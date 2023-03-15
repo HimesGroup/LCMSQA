@@ -3,3 +3,4 @@
 ^Meta$
 ^inst/examples$
 ^\.github$
+^cran-comments\.md$
