@@ -76,8 +76,8 @@ started.
 
 The example data used in this vignette can be downloaded from the following
 links:
-[QC_sample1.mzML](https://github.com/HimesGroup/LCMSQA/raw/main/inst/examples/example1.mzML),
-[QC_sample2.mzML](https://github.com/HimesGroup/LCMSQA/raw/main/inst/examples/example2.mzML),
+[example1.mzML](https://github.com/HimesGroup/LCMSQA/raw/main/inst/examples/example1.mzML),
+[example2.mzML](https://github.com/HimesGroup/LCMSQA/raw/main/inst/examples/example2.mzML),
 and
 [IS_info.csv](https://github.com/HimesGroup/LCMSQA/raw/main/inst/examples/IS_info.csv)
 (right click -> save link as).
