@@ -2,7 +2,7 @@
 ## Validate mass-spectrometry files
 ################################################################################
 has_spectra <- function(x) {
-  all(hasSpectra(x))
+  all(MSnbase::hasSpectra(x))
 }
 
 ################################################################################
@@ -43,7 +43,7 @@ get_df <- function(x) {
   ## `x` is supposed to be a single file MSnExp object
   is(x, "MSnExp")
   d <- as.data.frame(x)
-  d$file <- pData(x)$fname
+  d$file <- MSnbase::pData(x)$fname
   d
 }
 
@@ -95,3 +95,13 @@ utils::globalVariables(
            "mzmax", "mzmin", "mzmed", "rt", "rtmax", "rtmin", "rtmed", "title",
            "xmax", "xmin", "ymax", "ymin")
        )
+
+
+################################################################################
+## BioC dependencies check
+################################################################################
+.verify_package <- function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop("Package '", pkg, "' is required. Please install and try again.")
+  }
+}

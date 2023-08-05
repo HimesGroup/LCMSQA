@@ -192,7 +192,7 @@ featuredetection_ui <- function(compound_dat, standard_skip = FALSE) {
       h5("3. Peak Grouping", style = "color:orange"),
       helpText("Chromatographic peak grouping using the ",
                tags$a("peak density",
-                      href="https://sneumann.github.io/xcms/reference/groupChromPeaks-density.html",
+                      href="https://sneumann.github.io/xcms/reference/do_groupChromPeaks_density.html",
                       target="_blank"),
                "method"),
       br(),

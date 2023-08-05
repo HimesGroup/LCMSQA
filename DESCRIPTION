@@ -1,6 +1,6 @@
 Package: LCMSQA
 Title: Liquid Chromatography/Mass Spectrometry (LC/MS) Quality Assessment
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: c(
     person(given = "Jaehyun",
            family = "Joo",
@@ -30,14 +30,16 @@ Imports:
     data.table,
     DT,
     ggplot2,
+    methods,
     plotly,
     shiny,
     shinycssloaders,
     shinyjs,
-    shinyWidgets,
-    xcms,
-    MSnbase
+    shinyWidgets
 Suggests:
+    BiocManager,
+    xcms,
+    MSnbase,
     knitr,
     rmarkdown
 VignetteBuilder: knitr

@@ -127,7 +127,7 @@ server <- function(input, output, session) {
   observeEvent(flist(), {
     v$fname <- tools::file_path_sans_ext(flist()$name)
     withProgress(message = "Reading Data...", value = 0, {
-      v$raw <- readMSData(
+      v$raw <- MSnbase::readMSData(
         flist()$datapath,
         pdata = new(
           "NAnnotatedDataFrame",
@@ -139,7 +139,7 @@ server <- function(input, output, session) {
       n <- nrow(flist())
       dl <- list()
       for (i in 1:n) {
-        dl[[i]] <- get_df(filterFile(v$raw, i))
+        dl[[i]] <- get_df(xcms::filterFile(v$raw, i))
         incProgress(1/n, detail = paste0("File ", i))
       }
       v$fdata <- rbindlist(dl)
@@ -320,7 +320,7 @@ server <- function(input, output, session) {
     integrate_method <- ifelse(input$integrate == "Mexican Hat", 1L, 2L)
     fitgauss_method <- ifelse(input$gauss == "False", FALSE, TRUE)
     showModal(modalDialog("Detecting features...", footer = NULL, size = "l"))
-    cpm <- CentWaveParam(
+    cpm <- xcms::CentWaveParam(
       ppm = input$ppm,
       peakwidth = input$peakwidth,
       snthresh = input$snthr,
@@ -331,20 +331,20 @@ server <- function(input, output, session) {
       fitgauss = fitgauss_method,
       noise = input$noise
     )
-    raw_sub <- filterMz(
+    raw_sub <- xcms::filterMz(
       v$raw, c(mzr()[1] - 5, mzr()[2] + 5) ## extend m/z window
     )
     if (any(is.finite(rtr()))) {
-      raw_sub <- filterRt(
+      raw_sub <- xcms::filterRt(
         raw_sub, c(rtr()[1] - 20, rtr()[2] + 20) ## extend RT window
       )
     }
-    m <- findChromPeaks(raw_sub, param = cpm)
-    m <- filterMz(m, mzr())
+    m <- xcms::findChromPeaks(raw_sub, param = cpm)
+    m <- xcms::filterMz(m, mzr())
     if (any(is.finite(rtr()))) {
-      m <- filterRt(m, rtr())
+      m <- xcms::filterRt(m, rtr())
     }
-    v$peak <- chromPeaks(m)
+    v$peak <- xcms::chromPeaks(m)
     if (is.null(v$peak)) {
       showNotification(
         ui = paste0("No peaks detected in the specified region! ",
@@ -354,15 +354,15 @@ server <- function(input, output, session) {
       v$ui_nopeak <- TRUE
     } else {
       updateTabsetPanel(session, "tabs", selected = "Feature Detection")
-      pdp <- PeakDensityParam(
+      pdp <- xcms::PeakDensityParam(
         sampleGroups = rep(1, nrow(input$upload)),
         bw = input$bw,
         minFraction = input$minfrac,
         binSize = input$binsize,
         maxFeatures = 100
       )
-      res <- groupChromPeaks(m, pdp)
-      if (nrow(featureDefinitions(res)) == 0) {
+      res <- xcms::groupChromPeaks(m, pdp)
+      if (nrow(xcms::featureDefinitions(res)) == 0) {
         showNotification(
           ui = paste0("No Features detected in the specified region! ",
                       "Adjust peak grouping parameters."),
@@ -370,9 +370,9 @@ server <- function(input, output, session) {
         )
         v$ui_nopeak <- TRUE
       } else {
-        fdef <- as.data.table(featureDefinitions(res), keep.rownames = "feature")
-        fval <- as.data.table(featureValues(res), keep.rownames = "feature")
-        colnames(fval)[-1] <- as.character(pData(raw_sub)$fname)
+        fdef <- as.data.table(xcms::featureDefinitions(res), keep.rownames = "feature")
+        fval <- as.data.table(xcms::featureValues(res), keep.rownames = "feature")
+        colnames(fval)[-1] <- as.character(MSnbase::pData(raw_sub)$fname)
         mz_cols <- c("mzmed", "mzmin", "mzmax")
         rt_cols <- c("rtmed", "rtmin", "rtmax")
         v$feature <- merge(fdef, fval, sort = FALSE)
@@ -442,7 +442,7 @@ server <- function(input, output, session) {
       DTOutput("feature_peak_map")
     ))
     peaklist <- as.data.table(v$peak)[v$feature$peakidx[[idx]], ]
-    peak_sub <- merge(peaklist, pData(v$raw), by.x = "sample",
+    peak_sub <- merge(peaklist, MSnbase::pData(v$raw), by.x = "sample",
                       by.y = "idx", sort = FALSE)
     peak_tbl <- copy(peak_sub)
     mz_cols <- c("mz", "mzmin", "mzmax")

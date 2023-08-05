@@ -80,10 +80,6 @@
 ##'   geom_rect labs alpha geom_text position_stack
 ##' @importFrom plotly plotlyOutput ggplotly subplot layout renderPlotly
 ##'   event_register event_data
-##' @importFrom xcms CentWaveParam PeakDensityParam
-##' @importMethodsFrom xcms findChromPeaks chromPeaks groupChromPeaks
-##'   featureDefinitions featureValues filterFile filterRt filterMz
-##' @importFrom MSnbase readMSData hasSpectra
-##' @importMethodsFrom MSnbase pData
+##' @importFrom methods is new
 "_PACKAGE"
 

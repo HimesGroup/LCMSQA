@@ -141,7 +141,7 @@ grouping).
 - integration: whether or not peak limits are found through descent on the
   Mexican Hat filtered data
 
-### 3. Peak grouping using the [peak density](https://sneumann.github.io/xcms/reference/groupChromPeaks-density.html) method
+### 3. Peak grouping using the [peak density](https://sneumann.github.io/xcms/reference/do_groupChromPeaks_density.html) method
 
 - bandwidth: the bandwidth (standard deviation of the smoothing kernel) to be
   used

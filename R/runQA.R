@@ -15,6 +15,8 @@
 ##'
 ##' @export
 runQA <- function() {
+  .verify_package("xcms")
+  .verify_package("MSnbase")
   ## Enable js
   useShinyjs() ## need to initiate
   shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
