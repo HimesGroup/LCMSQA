@@ -44,7 +44,7 @@ In the application UI, a user can tune the following parameters:
 \item compound (or m/z) with a ppm tolerance
 \item retention time in second (min, max)
 }
-\item Peak picking using the centWave method (see \link[xcms:findChromPeaks-centWave]{xcms::CentWaveParam})
+\item Peak picking using the centWave method (see xcms::CentWaveParam)
 \itemize{
 \item ppm: the maximal tolerated m/z deviation in consecutive scans in ppm for
 the initial region of interest (ROI) definition
@@ -62,7 +62,7 @@ chromatographic peaks
 \item integration: whether or not peak limits are found through descent on the
 Mexican Hat filtered data
 }
-\item Peak grouping using the peak density method (see \link[xcms:groupChromPeaks-density]{xcms::PeakDensityParam})
+\item Peak grouping using the peak density method (see xcms::PeakDensityParam)
 \itemize{
 \item bandwidth: the bandwidth (standard deviation of the smoothing kernel) to
 be used

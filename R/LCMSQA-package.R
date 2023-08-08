@@ -35,7 +35,7 @@
 ##' - Set m/z and retention time of interest
 ##'   + compound (or m/z) with a ppm tolerance
 ##'   + retention time in second (min, max)
-##' - Peak picking using the centWave method (see [xcms::CentWaveParam])
+##' - Peak picking using the centWave method (see xcms::CentWaveParam)
 ##'   + ppm: the maximal tolerated m/z deviation in consecutive scans in ppm for
 ##'   the initial region of interest (ROI) definition
 ##'   + peak width: the expected approximate peak width in chromatographic space
@@ -51,7 +51,7 @@
 ##'   chromatographic peaks
 ##'   + integration: whether or not peak limits are found through descent on the
 ##'   Mexican Hat filtered data
-##' - Peak grouping using the peak density method (see [xcms::PeakDensityParam])
+##' - Peak grouping using the peak density method (see xcms::PeakDensityParam)
 ##'   + bandwidth: the bandwidth (standard deviation of the smoothing kernel) to
 ##'   be used
 ##'   + min fraction: the minimum fraction of samples in which the peaks has to
