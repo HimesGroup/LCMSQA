@@ -2,13 +2,13 @@
 
 * Ubuntu 22.04 LTS: devel, release
 * macOS-lastest: release
-* Win-builder: devel, release
+* Win-builder: oldrel, devel, release
 
 ## R CMD check results
 
 0 errors | 0 warnings | 1 note
 
-* Packages suggested but not available for checking: 'xcms', 'MSnbase'
+* Uses the non-portable packages: 'MSnbase', 'xcms'
 
 xcms and MSnbase are BioC packages
 
