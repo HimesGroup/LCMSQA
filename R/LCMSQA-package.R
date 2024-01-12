@@ -72,7 +72,6 @@
 ##' @importFrom shinyjs useShinyjs toggleState hide
 ##' @importFrom data.table fread data.table as.data.table rbindlist setnames
 ##'   setcolorder melt copy :=
-##' @importFrom bslib bs_theme font_google
 ##' @importFrom bsplus use_bs_tooltip bs_embed_popover bs_embed_tooltip
 ##' @importFrom ggplot2 ggplot aes theme theme_bw geom_line facet_wrap
 ##'   geom_linerange ylab geom_point scale_x_continuous scale_y_continuous

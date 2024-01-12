@@ -4,12 +4,6 @@ ui <- fluidPage(
   ## Enable tooltip
   use_bs_tooltip(),
   ## Set theme
-  theme = bs_theme(
-    bootswatch = "minty",
-    heating_font = font_google("Roboto"),
-    base_font = font_google("Roboto"),
-    code_font = font_google("JetBrains Mono")
-    ),
   titlePanel("LC/MS Quality Assessment"),
   ## File upload
   sidebarLayout(
